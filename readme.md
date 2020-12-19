@@ -24,19 +24,21 @@
   | 标注                        | √        | √      | √      |        |
   | 将标注条目设置为 已/未 完成 | √        | √      | √      | √      |
 
-  # PROBLEMS
+  当前运行地址：http://121.196.41.4/
 
+  # PROBLEMS
+  
   - 刷新加载很慢（可能是服务器性能太差或未将veu打包或axios方法问题）
   - 导入数据需要utf-8格式，且不能有空行
   - 指南使用tui-editor模板，如果输入太快，光标会自动移动到末尾（没有思路修改）
   - 假设admin为超级用户，为其在project1设置某角色再删除该设置，admin将失去对该项目的控制权
-  - 只测试了两个浏览器的并发，若label条目被其他用户增/删，需要重新进入“数据”列表或刷新页面以重新显示
+- 只测试了两个浏览器的并发，若label条目被其他用户增/删，需要重新进入“数据”列表或刷新页面以重新显示
   - 使用localStorage，同一浏览器两个标签页可以登录不同账号，但是刷新后都会变成最后登录账号
 
   # RUN
 
   ## fontend
-
+  
   ```shell
   # 在frontend文件夹下
   
@@ -48,11 +50,11 @@
   # nuxt.config.js中设置server和proxy
   
   # 运行
-  npm run dev
+npm run dev
   ```
 
   ## backend
-
+  
   ```shell
   # 在backend文件夹下
   
@@ -71,11 +73,11 @@
   # 静态文件被复制到staticfiles文件夹，可直接将该文件夹重命名为static
   
   # 运行
-  python manage.py runserver
+python manage.py runserver
   ```
 
   ## nginx
-
+  
   ```shell
   server {
       listen 80;
@@ -135,9 +137,9 @@
       }
   }
   
-  server_tokens off;
+server_tokens off;
   ```
 
   
-
+  
   原作者：https://github.com/doccano
