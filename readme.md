@@ -43,9 +43,10 @@
 pip3 install -r requirments.txt
 ```
 
-## 3.1 fontend
+## 3.1 frontend
 
 * nuxt.js
+* 可打包集成到Django
 
 ```shell
 # 在frontend文件夹下
@@ -87,12 +88,12 @@ python3 manage.py create_admin
 python3 manage.py runserver
 ```
 
-## 3.3 nginx
+## 3.3 nginx设置
 
   ```
 server {
     listen 80;
-    server_name    yourserver;
+    server_name    yourserver; #ip地址或域名
 
     gzip            on;
     gzip_types      text/plain application/xml text/css application/javascript;
@@ -143,7 +144,7 @@ server {
     }
 
     location /static/ {
-        root /home/mydoccano/backend/;
+        root /home/mydoccano/backend/; # backend所在目录
         break;
     }
 }
