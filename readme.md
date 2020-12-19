@@ -79,10 +79,10 @@ python3 manage.py create_roles
 # 创建超级用户
 python3 manage.py create_admin
 
-# 复制静态文件到static文件夹，否则admin后台无样式文件
-python3 manage.py collectstatic
-# exception：静态文件被复制到staticfiles文件夹
-# 直接将该文件夹重命名为static
+# 若没有static文件夹，创建并复制静态文件到static，否则admin后台无样式文件
+# exception：静态文件被复制到staticfiles文件夹。直接将该文件夹重命名为static
+    mkdir static
+    python3 manage.py collectstatic
 
 # 运行，默认端口8000
 python3 manage.py runserver
