@@ -1,4 +1,6 @@
-- # FUNCTIONS
+原作者：https://github.com/doccano
+
+- # 1. Functions
 
   |          | 账号   | 密码       |
   | -------- | ------ | ---------- |
@@ -26,7 +28,7 @@
 
   当前运行地址：http://121.196.41.4/
 
-  # PROBLEMS
+  # 2. Problems
   
   - 刷新加载很慢（可能是服务器性能太差或未将veu打包或axios方法问题）
   - 导入数据需要utf-8格式，且不能有空行
@@ -35,25 +37,33 @@
 - 只测试了两个浏览器的并发，若label条目被其他用户增/删，需要重新进入“数据”列表或刷新页面以重新显示
   - 使用localStorage，同一浏览器两个标签页可以登录不同账号，但是刷新后都会变成最后登录账号
 
-  # RUN
+  # 3. Run
 
-  ## fontend
+  ```
+  pip3 install -r requirments.txt
+  ```
+  
+  ## 3.1 fontend
+  
+  * nuxt.js
   
   ```shell
   # 在frontend文件夹下
   
   # 安装框架与依赖
   npm install --save nuxt
-  
+
   # tui-editor存在问题，右侧栏目宽度只有50px，参考https://github.com/nhn/tui.editor/issues/923，修改tui-editor.js中19616行代码
-  
+
   # nuxt.config.js中设置server和proxy
   
   # 运行
-npm run dev
+  npm run dev
   ```
-
-  ## backend
+  
+  ## 3.2 backend
+  
+  * Django
   
   ```shell
   # 在backend文件夹下
@@ -65,18 +75,18 @@ npm run dev
   # 创建角色
   python manage.py create_roles
   
-  # 创建超级用户
+# 创建超级用户
   python manage.py create_admin
-  
+
   # 复制静态文件到static文件夹，否则admin后台无样式文件
   python manage.py collectstatic
   # 静态文件被复制到staticfiles文件夹，可直接将该文件夹重命名为static
   
   # 运行
-python manage.py runserver
+  python manage.py runserver
   ```
-
-  ## nginx
+  
+  ## 3.3 nginx
   
   ```shell
   server {
@@ -129,17 +139,14 @@ python manage.py runserver
       location = /swagger {
           absolute_redirect off;
           return 301 /swagger/;
-      }
+    }
   
-      location /static/ {
+    location /static/ {
           root /home/mydoccano/backend/;
           break;
       }
   }
   
-server_tokens off;
+  server_tokens off;
   ```
-
   
-  
-  原作者：https://github.com/doccano
