@@ -32,12 +32,17 @@
 
 # 2. Problems
 
-- 刷新加载很慢（可能是服务器性能太差或未将veu打包或axios方法问题）
+- 刷新加载很慢
+  - 原因：服务器性能较差或未将前端打包为静态资源
+  - 前端nuxt打包缺失static文件夹，还需添加动态路由
 - 导入数据需要utf-8格式，且不能有空行
-- 指南使用tui-editor模板，如果输入太快，光标会自动移动到末尾（无修改思路）
+- 指南使用tui-editor模板，如果输入太快，光标会自动移动到末尾
+  - 原因：每个字符的改变都会触发上传
+  - 可添加保存按钮，点击保存才上传
 - 假设admin为超级用户，为其在project1设置某角色再删除该设置，admin将失去对该项目的控制权
 - 只测试了两个浏览器的并发，若label条目被其他用户增/删，需要重新进入“数据”列表或刷新页面以重新显示
-- 使用localStorage，同一浏览器两个标签页可以登录不同账号，但是刷新后都会变成最后登录账号
+- 同一浏览器两个标签页可以登录不同账号，但是刷新后都会变成最后登录账号
+  - 原因：使用LocalStorage，同时只能保存一个账号信息
 
 # 3. Run
 
@@ -87,7 +92,10 @@ python3 manage.py create_admin
     python3 manage.py collectstatic
 
 # 运行，默认端口8000
+# 直接运行
 python3 manage.py runserver
+# gunicorn代理
+gunicorn -b 0.0.0.0:8000 -w 4 backend.wsgi -t 300
 ```
 
 ## 3.3 nginx设置
