@@ -1,21 +1,12 @@
 {
-  "name": "mydecanno",
+  "name": "doccano",
   "version": "1.0.0",
-  "private": true,
+  "description": "doccano is an open source annotation tools for machine learning practitioner.",
   "scripts": {
-    "lint": "eslint --ext .js,.vue --ignore-path .gitignore .",
-    "lintfix": "eslint --fix --ext .js,.vue --ignore-path .gitignore .",
-    "precommit": "yarn lint",
-    "test": "jest",
     "dev": "nuxt",
     "build": "nuxt build",
     "start": "nuxt start",
     "generate": "nuxt generate"
-  },
-  "config": {
-    "nuxt": {
-      "host": "0.0.0.0"
-    }
   },
   "dependencies": {
     "@nuxtjs/axios": "^5.12.0",
@@ -31,6 +22,7 @@
     "tui-editor": "^1.4.10",
     "vue-chartjs": "^3.5.0",
     "vue-shortkey": "^3.1.7",
+    "vue-youtube": "^1.4.0",
     "vuetify": "^2.3.4",
     "yarn": "^1.22.4"
   },

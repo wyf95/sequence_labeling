@@ -1,163 +1,69 @@
-Ô­×÷Õß£ºhttps://github.com/doccano
+åŸä½œè€…ï¼šhttps://github.com/doccano
 
 # 1. Functions
 
-|          | ÕËºÅ   | ÃÜÂë       |
-| -------- | ------ | ---------- |
-| ³¬¼¶ÓÃ»§ | admin  | root       |
-|          | admin2 | root       |
-| ÆÕÍ¨ÓÃ»§ | user1  | !QWEqwe123 |
-|          | user2  | !QWEqwe123 |
+ç”¨æˆ·è§’è‰²è¯´æ˜ï¼š
 
-ÓÃ»§½ÇÉ«ËµÃ÷£º
+- åˆ†ä¸ºè¶…çº§ç”¨æˆ·å’Œæ™®é€šç”¨æˆ·
+- è¶…çº§ç”¨æˆ·æ˜¯å‘½ä»¤è¡Œåˆ›å»ºçš„ç”¨æˆ·ï¼Œå¯è¿›å…¥åå°
+- æ‰€æœ‰ç”¨æˆ·å¯è¢«åˆ†é…ç®¡ç†å‘˜/æ ‡æ³¨å‘˜/å®¡æŸ¥å‘˜ä¸‰ç§è§’è‰²
+- åˆå§‹è¶…çº§ç”¨æˆ·è´¦å·ï¼šname: admin / password: root
 
-- ·ÖÎª³¬¼¶ÓÃ»§ºÍÆÕÍ¨ÓÃ»§
-- ³¬¼¶ÓÃ»§ÊÇÃüÁîĞĞ´´½¨µÄÓÃ»§£¬¿É½øÈëºóÌ¨
-- ËùÓĞÓÃ»§¿É±»·ÖÅä¹ÜÀíÔ±/±ê×¢Ô±/Éó²éÔ±ÈıÖÖ½ÇÉ«
-
-|                             | ³¬¼¶ÓÃ»§ | ¹ÜÀíÔ± | Éó²éÔ± | ±ê×¢Ô± |
+|                             | è¶…çº§ç”¨æˆ· | ç®¡ç†å‘˜ | å®¡æŸ¥å‘˜ | æ ‡æ³¨å‘˜ |
 | --------------------------- | -------- | ------ | ------ | ------ |
-| ´´½¨/É¾³ıÏîÄ¿               | ¡Ì        |        |        |        |
-| µ¼Èë/µ¼³öÊı¾İ               | ¡Ì        | ¡Ì      |        |        |
-| ÉèÖÃ±êÇ©                    | ¡Ì        | ¡Ì      |        |        |
-| ÎªÏîÄ¿·ÖÅäÓÃ»§½ÇÉ«          | ¡Ì        | ¡Ì      |        |        |
-| ĞŞ¸ÄÖ¸ÄÏ                    | ¡Ì        | ¡Ì      |        |        |
-| ²é¿´Í³¼ÆÊı¾İ                | ¡Ì        | ¡Ì      |        |        |
-| ½«±ê×¢ÌõÄ¿ÉèÖÃÎª ÒÑ/Î´ Íê³É | ¡Ì        | ¡Ì      | ¡Ì      |        |
-| ±ê×¢                        | ¡Ì        | ¡Ì      | ¡Ì      | ¡Ì      |
+| åˆ›å»º/åˆ é™¤é¡¹ç›®               | âˆš        |        |        |        |
+| å¯¼å…¥/å¯¼å‡ºæ•°æ®               | âˆš        | âˆš      |        |        |
+| è®¾ç½®æ ‡ç­¾                    | âˆš        | âˆš      |        |        |
+| ä¸ºé¡¹ç›®åˆ†é…ç”¨æˆ·è§’è‰²          | âˆš        | âˆš      |        |        |
+| ä¿®æ”¹æŒ‡å—                    | âˆš        | âˆš      |        |        |
+| æŸ¥çœ‹ç»Ÿè®¡æ•°æ®                | âˆš        | âˆš      |        |        |
+| å°†æ ‡æ³¨æ¡ç›®è®¾ç½®ä¸º å·²/æœª å®Œæˆ | âˆš        | âˆš      | âˆš      |        |
+| æ ‡æ³¨                        | âˆš        | âˆš      | âˆš      | âˆš      |
 
-µ±Ç°ÔËĞĞµØÖ·£ºhttp://121.196.41.4/
+å½“å‰è¿è¡Œåœ°å€ï¼šhttp://121.196.41.4/
 
-ºóÌ¨ÔËĞĞµØÖ·£ºhttp://121.196.41.4/admin
+åå°è¿è¡Œåœ°å€ï¼šhttp://121.196.41.4/admin
 
 # 2. Problems
 
-- Ë¢ĞÂ¼ÓÔØºÜÂı
-  - Ô­Òò£º·şÎñÆ÷ĞÔÄÜ½Ï²î»òÎ´½«Ç°¶Ë´ò°üÎª¾²Ì¬×ÊÔ´
-  - Ç°¶Ënuxt´ò°üÈ±Ê§staticÎÄ¼ş¼Ğ£¬»¹ĞèÌí¼Ó¶¯Ì¬Â·ÓÉ
-- µ¼ÈëÊı¾İĞèÒªutf-8¸ñÊ½£¬ÇÒ²»ÄÜÓĞ¿ÕĞĞ
-- Ö¸ÄÏÊ¹ÓÃtui-editorÄ£°å£¬Èç¹ûÊäÈëÌ«¿ì£¬¹â±ê»á×Ô¶¯ÒÆ¶¯µ½Ä©Î²
-  - Ô­Òò£ºÃ¿¸ö×Ö·ûµÄ¸Ä±ä¶¼»á´¥·¢ÉÏ´«
-  - ¿ÉÌí¼Ó±£´æ°´Å¥£¬µã»÷±£´æ²ÅÉÏ´«
-- ¼ÙÉèadminÎª³¬¼¶ÓÃ»§£¬ÎªÆäÔÚproject1ÉèÖÃÄ³½ÇÉ«ÔÙÉ¾³ı¸ÃÉèÖÃ£¬admin½«Ê§È¥¶Ô¸ÃÏîÄ¿µÄ¿ØÖÆÈ¨
-- Ö»²âÊÔÁËÁ½¸öä¯ÀÀÆ÷µÄ²¢·¢£¬ÈôlabelÌõÄ¿±»ÆäËûÓÃ»§Ôö/É¾£¬ĞèÒªÖØĞÂ½øÈë¡°Êı¾İ¡±ÁĞ±í»òË¢ĞÂÒ³ÃæÒÔÖØĞÂÏÔÊ¾
-- Í¬Ò»ä¯ÀÀÆ÷Á½¸ö±êÇ©Ò³¿ÉÒÔµÇÂ¼²»Í¬ÕËºÅ£¬µ«ÊÇË¢ĞÂºó¶¼»á±ä³É×îºóµÇÂ¼ÕËºÅ
-  - Ô­Òò£ºÊ¹ÓÃLocalStorage£¬Í¬Ê±Ö»ÄÜ±£´æÒ»¸öÕËºÅĞÅÏ¢
+- åˆ·æ–°åŠ è½½å¾ˆæ…¢
+  - åŸå› ï¼šæœåŠ¡å™¨æ€§èƒ½è¾ƒå·®æˆ–æœªå°†å‰ç«¯æ‰“åŒ…ä¸ºé™æ€èµ„æº
+  - å‰ç«¯nuxtæ‰“åŒ…ç¼ºå¤±staticæ–‡ä»¶å¤¹ï¼Œè¿˜éœ€æ·»åŠ åŠ¨æ€è·¯ç”±
+- å¯¼å…¥æ•°æ®éœ€è¦utf-8æ ¼å¼ï¼Œä¸”ä¸èƒ½æœ‰ç©ºè¡Œ
+- æŒ‡å—ä½¿ç”¨tui-editoræ¨¡æ¿ï¼Œå¦‚æœè¾“å…¥å¤ªå¿«ï¼Œå…‰æ ‡ä¼šè‡ªåŠ¨ç§»åŠ¨åˆ°æœ«å°¾
+  - åŸå› ï¼šæ¯ä¸ªå­—ç¬¦çš„æ”¹å˜éƒ½ä¼šè§¦å‘ä¸Šä¼ 
+  - å¯æ·»åŠ ä¿å­˜æŒ‰é’®ï¼Œç‚¹å‡»ä¿å­˜æ‰ä¸Šä¼ 
+- å‡è®¾adminä¸ºè¶…çº§ç”¨æˆ·ï¼Œä¸ºå…¶åœ¨project1è®¾ç½®æŸè§’è‰²å†åˆ é™¤è¯¥è®¾ç½®ï¼Œadminå°†å¤±å»å¯¹è¯¥é¡¹ç›®çš„æ§åˆ¶æƒ
+- åªæµ‹è¯•äº†ä¸¤ä¸ªæµè§ˆå™¨çš„å¹¶å‘ï¼Œè‹¥labelæ¡ç›®è¢«å…¶ä»–ç”¨æˆ·å¢/åˆ ï¼Œéœ€è¦é‡æ–°è¿›å…¥â€œæ•°æ®â€åˆ—è¡¨æˆ–åˆ·æ–°é¡µé¢ä»¥é‡æ–°æ˜¾ç¤º
+- åŒä¸€æµè§ˆå™¨ä¸¤ä¸ªæ ‡ç­¾é¡µå¯ä»¥ç™»å½•ä¸åŒè´¦å·ï¼Œä½†æ˜¯åˆ·æ–°åéƒ½ä¼šå˜æˆæœ€åç™»å½•è´¦å·
+  - åŸå› ï¼šä½¿ç”¨LocalStorageï¼ŒåŒæ—¶åªèƒ½ä¿å­˜ä¸€ä¸ªè´¦å·ä¿¡æ¯
 
 # 3. Run
 
-```
-pip3 install -r requirments.txt
-```
-
-## 3.1 frontend
-
-* nuxt.js
-* ¿É´ò°ü¼¯³Éµ½Django
+* DockeråŠ é€Ÿ
 
 ```shell
-# ÔÚfrontendÎÄ¼ş¼ĞÏÂ
-
-# °²×°ÒÀÀµ
-npm install --save nuxt
-
-# tui-editor´æÔÚÎÊÌâ£¬ÓÒ²àÀ¸Ä¿¿í¶ÈÖ»ÓĞ50px£¬²Î¿¼https://github.com/nhn/tui.editor/issues/923£¬ĞŞ¸Änode_modules/tui-editor/dist/tui-editor-EditorÖĞ19616ĞĞ´úÂë
-
-# nuxt.config.jsÖĞÉèÖÃserverºÍproxy
-
-# ÔËĞĞ
-npm run dev
-```
-
-## 3.2 backend
-
-* Django
-
-```shell
-# ÔÚbackendÎÄ¼ş¼ĞÏÂ
-
-# ¿ÉÏÈÉ¾³ıdb.sqlit3ÎÄ¼ş
-# Êı¾İ¿âÇ¨ÒÆ
-python3 manage.py migrate
-
-# ´´½¨½ÇÉ«
-python3 manage.py create_roles
-
-# ´´½¨³¬¼¶ÓÃ»§
-python3 manage.py create_admin
-
-# ÈôÃ»ÓĞstaticÎÄ¼ş¼Ğ£¬´´½¨²¢¸´ÖÆ¾²Ì¬ÎÄ¼şµ½static£¬·ñÔòadminºóÌ¨ÎŞÑùÊ½ÎÄ¼ş
-# exception£º¾²Ì¬ÎÄ¼ş±»¸´ÖÆµ½staticfilesÎÄ¼ş¼Ğ¡£Ö±½Ó½«¸ÃÎÄ¼ş¼ĞÖØÃüÃûÎªstatic
-    mkdir static
-    python3 manage.py collectstatic
-
-# ÔËĞĞ£¬Ä¬ÈÏ¶Ë¿Ú8000
-# Ö±½ÓÔËĞĞ
-python3 manage.py runserver
-# gunicorn´úÀí
-gunicorn -b 0.0.0.0:8000 -w 4 backend.wsgi -t 300
-```
-
-## 3.3 nginxÉèÖÃ
-
-  ```
-server {
-    listen 80;
-    server_name    yourserver; #ipµØÖ·»òÓòÃû
-
-    gzip            on;
-    gzip_types      text/plain application/xml text/css application/javascript;
-    gzip_min_length 1000;
-
-    charset utf-8;
-
-    add_header X-Frame-Options DENY;
-    add_header X-Content-Type-Options nosniff;
-    add_header X-XSS-Protection "1; mode=block";
-
-    location / {
-        proxy_pass http://localhost:3000/;
-        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
-        proxy_set_header Host $host;
-    }
-
-    location /v1/ {
-        proxy_pass http://localhost:3000/v1/;
-        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
-        proxy_set_header Host $host;
-        proxy_redirect off;
-        proxy_read_timeout  300;
-    }
-
-    location /admin/ {
-        proxy_pass http://localhost:8000/admin/;
-        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
-        proxy_set_header Host $host;
-        proxy_redirect off;
-    }
-
-    location = /admin {
-        absolute_redirect off;
-        return 301 /admin/;
-    }
-
-    location /swagger/ {
-        proxy_pass http://localhost:8000/swagger/;
-        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
-        proxy_set_header Host $host;
-        proxy_redirect off;
-    }
-
-    location = /swagger {
-        absolute_redirect off;
-        return 301 /swagger/;
-    }
-
-    location /static/ {
-        root /home/mydoccano/backend/; # backendËùÔÚÄ¿Â¼
-        break;
-    }
+sudo tee /etc/docker/daemon.json <<-'EOF'
+{
+  "registry-mirrors": ["https://13c21w00.mirror.aliyuncs.com"]
 }
+EOF
+sudo systemctl daemon-reload
+sudo systemctl restart docker
+```
 
-server_tokens off;
-  ```
+* Run
+
+```shell
+docker-compose up
+```
+
+* nginxï¼ˆå¯é€‰ï¼‰
+
+```shell
+# å…ˆä¿®æ”¹nginx/sl.nginx.confä¸‹server_nameå’Œstaticå¯¹åº”çš„æ–‡ä»¶è·¯å¾„
+cp nginx/sl.nginx.conf /etc/nginx/conf.d/
+nginx -s reload
+nginx -t
+```
+

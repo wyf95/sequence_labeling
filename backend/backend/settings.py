@@ -191,6 +191,8 @@ STATIC_ROOT = '/static/'
 
 IMPORT_BATCH_SIZE = env.int('IMPORT_BATCH_SIZE', 500)
 
+STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
+
 GOOGLE_TRACKING_ID = env('GOOGLE_TRACKING_ID', 'UA-125643874-2').strip()
 
 if DEBUG:

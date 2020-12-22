@@ -34,11 +34,10 @@ schema_view = get_schema_view(
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('social/', include('social_django.urls')),
     path('api-auth/', include('rest_framework.urls')),
     path('swagger/', schema_view.with_ui('swagger', cache_timeout=0), name='schema-swagger-ui'),
     path('v1/', include('api.urls')),
-    re_path('', TemplateView.as_view(template_name='index.html')),
+    # re_path('', TemplateView.as_view(template_name='index.html')),
 ]
 
 if 'cloud_browser' in settings.INSTALLED_APPS:

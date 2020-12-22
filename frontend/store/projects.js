@@ -151,6 +151,7 @@ export const mutations = {
   },
   setCurrent(state, payload) {
     state.current = payload
+    console.log(state.current)
   },
   saveSearchOptions(state, options) {
     const checkpoint = JSON.parse(localStorage.getItem('checkpoint')) || {}

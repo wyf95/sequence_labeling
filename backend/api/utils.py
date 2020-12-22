@@ -17,7 +17,7 @@ from rest_framework.renderers import JSONRenderer
 from seqeval.metrics.sequence_labeling import get_entities
 
 from .exceptions import FileParseException
-from .models import Label
+from .models import Label, User
 from .serializers import DocumentSerializer, LabelSerializer
 
 
@@ -375,11 +375,16 @@ class JSONPainter(object):
         serializer = DocumentSerializer(documents, many=True)
         data = []
         for d in serializer.data:
-            d['meta'] = json.loads(d['meta'])
+            # d['meta'] = json.loads(d['meta'])
             for a in d['annotations']:
+                a['label'] = Label.objects.get(id=a['label']).text   
+                a['user'] = User.objects.get(id=a['user']).username
                 a.pop('id')
                 a.pop('prob')
                 a.pop('document')
+                a.pop('created_at')
+                a.pop('updated_at')
+            d.pop('meta')
             data.append(d)
         return data
 
@@ -398,7 +403,8 @@ class JSONPainter(object):
                 labels.append([label_start, label_end, label_text])
             d.pop('annotations')
             d['labels'] = labels
-            d['meta'] = json.loads(d['meta'])
+            # d['meta'] = json.loads(d['meta'])
+            d.pop('meta')
             data.append(d)
         return data
 

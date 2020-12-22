@@ -1,0 +1,31 @@
+version: "3.7"
+services:
+
+  backend:
+    image: python:3.8.6-slim-buster
+    volumes:
+      - .:/src
+    command: ["/src/backend/django.sh"]
+    environment:
+      ADMIN_USERNAME: "admin"
+      ADMIN_PASSWORD: "root"
+      ADMIN_EMAIL: "admin@example.com"
+    ports:
+      - 8000:8000
+
+  frontend:
+    build: ./frontend
+    command: ["/src/frontend/dev-nuxt.sh"]
+    environment:
+      API_URL: "http://backend:8000"
+      PORT: 3000
+    volumes:
+      - .:/src
+      - node_modules:/src/frontend/node_modules
+    ports:
+      - 3000:3000
+    depends_on:
+      - backend
+
+volumes:
+  node_modules:

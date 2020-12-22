@@ -51,7 +51,7 @@ export const fileFormatRules = (msg) => {
 export const uploadFileRules = (msg) => {
   return [
     v => !!v || msg.fileRequired,
-    v => !v || v.size < 1000000 || msg.fileLessThan1MB
+    // v => !v || v.size < 1000000 || msg.fileLessThan1MB
   ]
 }
 

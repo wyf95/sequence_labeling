@@ -29,7 +29,7 @@ export default {
 
   server: {
     host: '0.0.0.0',
-    port: 3000
+    port: process.env.PORT
   },
 
   env: {
@@ -63,11 +63,6 @@ export default {
     '@nuxtjs/eslint-module'
   ],
 
-  buildModules: [
-    ['@nuxtjs/google-analytics', {
-      id: process.env.GOOGLE_TRACKING_ID
-    }]
-  ],
   /*
   ** Axios module configuration
   ** See https://axios.nuxtjs.org/options
@@ -79,7 +74,7 @@ export default {
   proxy: {
     // Use a fake value for use at build-time
     '/v1/': {
-      target: 'http://127.0.0.1:8000'
+      target: process.env.API_URL || 'http://127.0.0.1:8000'
     },
   },
   
