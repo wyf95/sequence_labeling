@@ -56,6 +56,8 @@ sudo systemctl restart docker
 
 ```shell
 docker-compose up
+
+# 访问: 127.0.0.1:3000
 ```
 
 * nginx（可选）
