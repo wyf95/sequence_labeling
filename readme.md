@@ -40,6 +40,17 @@
 
 # 3. Run
 
+* Clone
+
+```shell
+git clone git@gitee.com:HITSZ-CS/sequence-tagging-system.git
+
+# windows
+git@gitee.com:HITSZ-CS/sequence-tagging-system.git --config core.autocrlf=input
+```
+
+
+
 * Docker加速
 
 ```shell
