@@ -7,11 +7,10 @@ app="${root}/frontend"
 
 cd "${app}"
 
-
-if [[ ! -d node_modules/tui-editor ]]; then
+(
   echo "Installing dependencies"
-  npm install --save nuxt
-fi
+  npm install --registry https://registry.npm.taobao.org
 
-echo "Starting frontend server"
-npm run dev
+  echo "Starting frontend server"
+  npm run dev
+)

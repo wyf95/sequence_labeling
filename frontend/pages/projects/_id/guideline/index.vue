@@ -63,4 +63,13 @@ export default {
 .te-md-container .CodeMirror, .tui-editor-contents {
   font-size: 20px;
 }
+
+.tui-editor .te-md-splitter { 
+  display: none; 
+  position: absolute; 
+  left: 50%; top: 0; 
+  height: 100%; 
+  width: 100% !important; 
+  border-left: 1px solid #e5e5e5; 
+}
 </style>
