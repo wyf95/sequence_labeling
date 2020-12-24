@@ -46,7 +46,7 @@
 git clone git@gitee.com:HITSZ-CS/sequence-tagging-system.git
 
 # windows
-git@gitee.com:HITSZ-CS/sequence-tagging-system.git --config core.autocrlf=input
+git clone git@gitee.com:HITSZ-CS/sequence-tagging-system.git --config core.autocrlf=input
 ```
 
 
