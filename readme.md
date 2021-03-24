@@ -20,10 +20,6 @@
 | 将标注条目设置为 已/未 完成 | √        | √      | √      |        |
 | 标注                        | √        | √      | √      | √      |
 
-当前运行地址：http://121.196.41.4/
-
-后台运行地址：http://121.196.41.4/admin
-
 # 2. Problems
 
 - 刷新加载很慢
@@ -52,15 +48,6 @@ git clone git@gitee.com:HITSZ-CS/sequence-tagging-system.git --config core.autoc
 * Docker启动
 
 ```shell
-# 镜像加速（可选）
-sudo tee /etc/docker/daemon.json <<-'EOF'
-{
-  "registry-mirrors": ["https://13c21w00.mirror.aliyuncs.com"]
-}
-EOF
-sudo systemctl daemon-reload
-sudo systemctl restart docker
-
 # 修改脚本权限（可能需要）
 sudo chmod 777 frontend/dev-nuxt.sh
 sudo chmod 777 backend/django.sh
@@ -81,6 +68,8 @@ npm run dev
 
 # 后端backend
 cd ../backend
+# 安装依赖
+pip install -r requirments.txt
 # 数据库迁移
 # 可先删除db.sqlite3文件
 python manage.py makemigrations
@@ -89,6 +78,7 @@ python manage.py migrate
 python manage.py create_roles
 # 创建初始超级用户
 python manage.py create_admin
+
 # 启动
 python manage.py runserver 0.0.0.0:8000
 # or
