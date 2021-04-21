@@ -258,10 +258,10 @@ class PlainTextParser(FileParser):
             while '\n' in batch:
                 batch.remove('\n')
 
-            splitstr = '\n'
-            batch = ''.join(batch)
-            if splitstr in batch:
-                batch = batch.split(splitstr)
+            # splitstr = '\n'
+            # batch = ''.join(batch)
+            # if splitstr in batch:
+            #     batch = batch.split(splitstr)
 
             if not batch:
                 break
