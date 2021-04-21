@@ -61,7 +61,7 @@ npm run build
 npm run start
 
 # 后端django
-cd ../backend
+cd backend
 
 # 安装依赖
 # 若出现安装psycopg2报错，可先apt install postgresql
