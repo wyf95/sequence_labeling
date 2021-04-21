@@ -254,9 +254,18 @@ class PlainTextParser(FileParser):
         file = io.TextIOWrapper(file, encoding=file.encoding)
         while True:
             batch = list(itertools.islice(file, settings.IMPORT_BATCH_SIZE))
+            
+            while '\n' in batch:
+                batch.remove('\n')
+
+            splitstr = '\n'
+            batch = ''.join(batch)
+            if splitstr in batch:
+                batch = batch.split(splitstr)
+
             if not batch:
                 break
-            yield [{'text': line.strip()} for line in batch]
+            yield [{'text': line.strip('')} for line in batch]
 
 
 class CSVParser(FileParser):

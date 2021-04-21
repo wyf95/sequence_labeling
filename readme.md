@@ -1,5 +1,3 @@
-原作者：https://github.com/doccano
-
 # 1. Functions
 
 用户角色说明：
@@ -7,7 +5,6 @@
 - 分为超级用户和普通用户
 - 超级用户是命令行创建的用户，可进入后台
 - 所有用户可被分配管理员/标注员/审查员三种角色
-- 初始超级用户账号：name: admin / password: root
 
 |                             | 超级用户 | 管理员 | 审查员 | 标注员 |
 | --------------------------- | -------- | ------ | ------ | ------ |
@@ -22,10 +19,6 @@
 
 # 2. Problems
 
-- 刷新加载很慢
-  - 原因：服务器性能较差或未将前端打包为静态资源
-  - 前端nuxt打包会缺失static文件夹，还需添加动态路由
-- 导入数据需要utf-8格式，且不能有空行
 - guidline使用tui-editor模板，如果输入太快，光标会自动移动到末尾
   - 原因：每个字符的改变都会触发上传
   - 可设置保存按钮，点击保存才上传
@@ -45,6 +38,50 @@ git clone git@gitee.com:HITSZ-CS/sequence-tagging-system.git
 git clone git@gitee.com:HITSZ-CS/sequence-tagging-system.git --config core.autocrlf=input
 ```
 
+* 前后端分别启动
+
+```shell
+# 前端nuxt，node版本10.19，太新会出现依赖报错
+
+# 安装node与npm，切换node版本
+sudo apt install nodejs npm
+sudo npm install n -g
+sudo n 10.19
+
+cd frontend
+
+# 安装依赖
+npm install --save nuxt
+
+# 运行
+	# 调试模式
+npm run dev
+	# 发布模式
+npm run build
+npm run start
+
+# 后端django
+cd ../backend
+
+# 安装依赖
+# 若出现安装psycopg2报错，可先apt install postgresql
+pip install -r requirments.txt
+
+# 数据库迁移
+# 可先删除db.sqlite3文件
+python3 manage.py makemigrations
+python3 manage.py migrate
+# 创建角色
+python3 manage.py create_roles
+# 创建初始超级用户
+python3 manage.py create_admin
+
+# 运行
+python3 manage.py runserver 0.0.0.0:8000
+	# or
+gunicorn -b 0.0.0.0:8000 -w 4 backend.wsgi -t 300
+```
+
 * Docker启动
 
 ```shell
@@ -58,38 +95,10 @@ docker-compose up
 # 访问：127.0.0.1:3000
 ```
 
-* 前后端分别启动
-
-```shell
-# 前端nuxt
-cd frontend
-npm install --registry https://registry.npm.taobao.org
-npm run dev
-
-# 后端backend
-cd ../backend
-# 安装依赖
-pip install -r requirments.txt
-# 数据库迁移
-# 可先删除db.sqlite3文件
-python manage.py makemigrations
-python manage.py migrate
-# 创建角色
-python manage.py create_roles
-# 创建初始超级用户
-python manage.py create_admin
-
-# 启动
-python manage.py runserver 0.0.0.0:8000
-# or
-gunicorn -b 0.0.0.0:8000 -w 4 backend.wsgi -t 300
-```
-
 * nginx代理（可选）
 
 ```shell
-# 先修改nginx/sl.nginx.conf下
-# server_name和static对应的文件路径
+# 修改nginx/sl.nginx.conf下，server_name和static对应的文件路径
 cp nginx/sl.nginx.conf /etc/nginx/conf.d/
 nginx -s reload
 nginx -t

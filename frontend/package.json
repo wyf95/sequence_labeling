@@ -1,7 +1,6 @@
 {
-  "name": "doccano",
+  "name": "sequecn_labeling",
   "version": "1.0.0",
-  "description": "doccano is an open source annotation tools for machine learning practitioner.",
   "scripts": {
     "lint": "eslint --ext .js,.vue --ignore-path .gitignore .",
     "lintfix": "eslint --fix --ext .js,.vue --ignore-path .gitignore .",
@@ -20,7 +19,7 @@
     "chart.js": "^2.9.3",
     "codemirror": "^5.55.0",
     "js-cookie": "^2.2.1",
-    "nuxt": "^2.14.12",
+    "nuxt": "^2.15.4",
     "nuxt-i18n": "^6.13.12",
     "papaparse": "^5.2.0",
     "tui-editor": "^1.4.10",
@@ -32,6 +31,7 @@
   },
   "devDependencies": {
     "@nuxtjs/eslint-config": "^3.0.0",
+    "@nuxtjs/vuetify": "^1.11.2",
     "@nuxtjs/eslint-module": "^2.0.0",
     "@nuxtjs/google-analytics": "^2.3.0",
     "@vue/test-utils": "^1.0.3",

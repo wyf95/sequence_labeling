@@ -21,7 +21,7 @@ from furl import furl
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = path.dirname(path.dirname(path.abspath(__file__)))
 
-# ╩╥╬Ё╠Да©
+# О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫
 env = Env()
 env.read_env(path.join(BASE_DIR, '.env'), recurse=False)
 
@@ -188,8 +188,6 @@ STATICFILES_DIRS = [
 STATIC_URL = '/static/'
 
 STATIC_ROOT = '/static/'
-
-IMPORT_BATCH_SIZE = env.int('IMPORT_BATCH_SIZE', 500)
 
 STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 

@@ -13,7 +13,7 @@
     <v-toolbar-title
       class="ml-2 d-none d-sm-flex"
     >
-      doccano
+      Label
     </v-toolbar-title>
     <v-btn
       v-if="isAuthenticated && isIndividualProject"
