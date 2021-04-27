@@ -7,6 +7,7 @@
     :delete-annotation="removeEntity"
     :update-entity="updateEntity"
     :add-entity="addEntity"
+    @updateEntityConn="updateEntityConn"
   />
 </template>
 
@@ -36,7 +37,7 @@ export default {
 
   methods: {
     ...mapActions('labels', ['getLabelList']),
-    ...mapActions('documents', ['getDocumentList', 'deleteAnnotation', 'updateAnnotation', 'addAnnotation']),
+    ...mapActions('documents', ['getDocumentList', 'deleteAnnotation', 'updateAnnotation', 'updateAnnotationConn', 'addAnnotation']),
     removeEntity(annotationId) {
       const payload = {
         annotationId,
@@ -51,6 +52,14 @@ export default {
         projectId: this.$route.params.id
       }
       this.updateAnnotation(payload)
+    },
+    updateEntityConn(annotationId, conn){
+      const payload = {
+        annotationId,
+        connections: conn,
+        projectId: this.$route.params.id
+      }
+      this.updateAnnotationConn(payload)
     },
     addEntity(startOffset, endOffset, labelId) {
       const payload = {

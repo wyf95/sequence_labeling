@@ -137,7 +137,7 @@ class SequenceAnnotationSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = SequenceAnnotation
-        fields = ('id', 'prob', 'label', 'start_offset', 'end_offset', 'user', 'document', 'created_at', 'updated_at')
+        fields = ('id', 'label', 'start_offset', 'end_offset', 'user', 'document', 'created_at', 'updated_at', 'connections')
         read_only_fields = ('user',)
 
 

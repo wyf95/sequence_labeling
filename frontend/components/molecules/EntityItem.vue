@@ -5,8 +5,8 @@
     offset-y
   >
     <template v-slot:activator="{ on }">
-      <span :style="{ borderColor: color }" class="highlight bottom" v-on="on">
-        <span class="highlight__content">{{ content }}<v-icon class="delete" @click.stop="remove">mdi-close-circle</v-icon></span><span :data-label="label" :style="{ backgroundColor: color, color: textColor }" class="highlight__label" />
+      <span :style="{ borderColor: color }" class="highlight bottom flow-node-drag" v-on="on" :id="lid">
+        <span class="highlight__content flow-node-drag">{{ content }}<v-icon class="delete" @click.stop="remove">mdi-close-circle</v-icon></span><span :data-label="label" :style="{ backgroundColor: color, color: textColor }" class="highlight__label flow-node-drag" />
       </span>
     </template>
     <v-list
@@ -39,6 +39,11 @@ import { idealColor } from '~/plugins/utils.js'
 
 export default {
   props: {
+    lid: {
+      type: Number,
+      default: 0,
+      required: true
+    },
     content: {
       type: String,
       default: '',
@@ -112,6 +117,15 @@ export default {
   display: none;
 }
 .highlight:hover .delete {
+  display: block;
+}
+.highlight .next {
+  top:-15px;
+  right:-13px;
+  position:absolute;
+  display: none;
+}
+.highlight:hover .next {
   display: block;
 }
 .highlight__content {

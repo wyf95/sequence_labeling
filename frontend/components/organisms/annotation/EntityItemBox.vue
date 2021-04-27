@@ -3,6 +3,7 @@
     <entity-item
       v-for="(chunk, i) in chunks"
       :key="i"
+      :lid="chunk.id"
       :content="chunk.text"
       :newline="chunk.newline"
       :label="chunk.label"
@@ -17,6 +18,7 @@
       :position-y="y"
       absolute
       offset-y
+      style=""
     >
       <v-list
         dense
@@ -45,6 +47,9 @@
 
 <script>
 import EntityItem from '~/components/molecules/EntityItem'
+import lodash from 'lodash'
+import '~/plugins/jsplumb.js'
+import { easyFlowMixin } from '~/plugins/mixins.js'
 
 export default {
   components: {
@@ -88,9 +93,12 @@ export default {
       x: 0,
       y: 0,
       start: 0,
-      end: 0
+      end: 0,
+      jsPlumb: null,
+      conn: []
     }
   },
+
   computed: {
     sortedEntities() {
       return this.entities.slice().sort((a, b) => a.start_offset - b.start_offset)
@@ -116,6 +124,12 @@ export default {
       }
       // add the rest of text.
       chunks = chunks.concat(this.makeChunks(this.text.slice(startOffset, this.text.length)))
+
+      // 加载连线
+      this.$nextTick(() => {
+        this.loadNode()
+      })
+
       return chunks
     },
 
@@ -127,7 +141,139 @@ export default {
       return obj
     }
   },
+  
+  mixins: [easyFlowMixin],
+
   methods: {
+    loadNode() {
+      if (this.jsPlumb != null) {
+        this.jsPlumb.deleteEveryEndpoint()
+      }
+      this.conn = []
+      for (let i = 0; i < this.entities.length; i++) {
+        const node = this.entities[i]
+        let connections = node.connections.split(",")
+        for (var j = 0; j < connections.length && connections[j] !== ""; j++) {
+          this.conn.push({from: String(node.id), to: connections[j]})
+        }
+      }
+      this.$nextTick(() => {
+        this.jsPlumb = jsPlumb.getInstance()
+          this.$nextTick(() => {
+            this.jsPlumbInit()
+        })
+      })
+    },
+
+    jsPlumbInit() {
+      this.jsPlumb.ready(() => {
+        // 导入默认配置
+        this.jsPlumb.importDefaults(this.jsplumbSetting)
+        // 会使整个jsPlumb立即重绘。
+        this.jsPlumb.setSuspendDrawing(false, true)
+        // 初始化节点
+        this.loadLine()
+        // 连线
+        this.jsPlumb.bind("connection", (evt) => {
+          let from = evt.source.id
+          let to = evt.target.id
+          this.addConnection(from, to)
+        })
+        // 双击连线 删除
+        this.jsPlumb.bind('dblclick', (conn, originalEvent) => {
+          this.jsPlumb.deleteConnection(conn)
+          this.deleteConnection(conn.sourceId, conn.targetId)
+        })
+        // 连线
+        this.jsPlumb.bind("beforeDrop", (evt) => {
+          let from = evt.sourceId
+          let to = evt.targetId
+          if (from === to) {
+            return false
+          }
+          if (this.hasLine(from, to)) {
+            return false
+          }
+          if (this.hashOppositeLine(from, to)) {
+            return false
+          }
+          return true
+        })
+      })
+    },
+    // 添加连线
+    addConnection(from, to) {
+      for (var i = 0; i < this.entities.length; i++){
+        let node = this.entities[i]
+        if (from === String(node.id)) {
+          if (node.connections === ""){
+            this.$emit('updateEntityConn', node.id, to)
+          } else {
+            this.$emit('updateEntityConn', node.id, node.connections + ',' + to)
+          }
+          break
+        }
+      }
+    },
+    // 删除线
+    deleteConnection(from, to) {
+      for (var i = 0; i < this.entities.length; i++){
+        let node = this.entities[i]
+        if (from === String(node.id)) {
+          let connections = node.connections.replace(to, "")
+          connections = connections.replace(",,", ",")
+          if (connections[0] == ',') {
+            console.log(connections.slice(1))
+          }
+          if (connections[connections.length-1] == ',') {
+            connections = connections.slice(0,-1)
+          }
+          this.$emit('updateEntityConn', node.id, connections)
+          break
+        }
+      }
+      this.conn = this.conn.filter(function (line) {
+          if (line.from == from && line.to == to) {
+              return false
+          }
+          return true
+      })
+    },
+    // 加载线
+    loadLine() {
+      // 设置为节点
+      for (var i = 0; i < this.entities.length; i++){
+        let node = this.entities[i]
+        // 设置源点，可以拖出线连接其他节点
+        this.jsPlumb.makeSource(String(node.id), lodash.merge(this.jsplumbSourceOptions, {}))
+        // 设置目标点，其他源点拖出的线可以连接该节点
+        this.jsPlumb.makeTarget(String(node.id), this.jsplumbTargetOptions)
+      }
+      // 初始化连线
+      for (var i = 0; i < this.conn.length; i++){
+        let node = this.conn[i]
+        var params = {
+          source: node.from,
+          target: node.to
+        }
+        this.jsPlumb.connect(params, this.jsplumbConnectOptions)
+      }
+    },
+    // 是否具有该线
+    hasLine(from, to) {
+      for (var i = 0; i < this.conn.length; i++) {
+        var line = this.conn[i]
+        if (line.from === from && line.to === to) {
+          return true
+        }
+      }
+      return false
+    },
+    // 是否含有相反的线
+    hashOppositeLine(from, to) {
+      return this.hasLine(to, from)
+    },
+
     makeChunks(text) {
       const chunks = []
       const snippets = text.split('\n')

@@ -20,6 +20,9 @@ class AnnotationService {
   updateAnnotation(projectId, docId, annotationId, payload) {
     return this.request.patch(`/projects/${projectId}/docs/${docId}/annotations/${annotationId}`, payload)
   }
+  updateAnnotationConn(projectId, docId, annotationId, payload) {
+    return this.request.patch(`/projects/${projectId}/docs/${docId}/annotations/${annotationId}`, payload)
+  }
 }
 
 export default new AnnotationService()

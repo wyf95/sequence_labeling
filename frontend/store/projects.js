@@ -23,7 +23,6 @@ export const getters = {
   },
   canViewApproveButton(state) {
     const role = state.current.current_users_role
-    console.log(role)
     return role && !role.is_annotator
   },
   getFilterOption(state) {
@@ -151,7 +150,6 @@ export const mutations = {
   },
   setCurrent(state, payload) {
     state.current = payload
-    console.log(state.current)
   },
   saveSearchOptions(state, options) {
     const checkpoint = JSON.parse(localStorage.getItem('checkpoint')) || {}

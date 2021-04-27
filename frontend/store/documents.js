@@ -71,6 +71,10 @@ export const mutations = {
     const item = state.items[state.current].annotations.find(item => item.id === payload.id)
     Object.assign(item, payload)
   },
+  updateAnnotationConn(state, payload) {
+    const item = state.items[state.current].annotations.find(item => item.id === payload.id)
+    Object.assign(item, payload)
+  },
   updateSearchOptions(state, payload) {
     state.searchOptions = Object.assign(state.searchOptions, payload)
   },
@@ -173,6 +177,16 @@ export const actions = {
     AnnotationService.updateAnnotation(payload.projectId, documentId, payload.annotationId, payload)
       .then((response) => {
         commit('updateAnnotation', response.data)
+      })
+      .catch((error) => {
+        alert(error)
+      })
+  },
+  updateAnnotationConn({ commit, state }, payload) {
+    const documentId = state.items[state.current].id
+    AnnotationService.updateAnnotationConn(payload.projectId, documentId, payload.annotationId, payload)
+      .then((response) => {
+        commit('updateAnnotationConn', response.data)
       })
       .catch((error) => {
         alert(error)

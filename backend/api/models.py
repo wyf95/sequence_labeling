@@ -87,7 +87,6 @@ class Label(models.Model):
         )
 
 
-
 class Document(models.Model):
     text = models.TextField()
     project = models.ForeignKey(Project, related_name='documents', on_delete=models.CASCADE)
@@ -102,9 +101,6 @@ class Document(models.Model):
 
 class Annotation(models.Model):
     objects = AnnotationManager()
-
-    prob = models.FloatField(default=0.0)
-    manual = models.BooleanField(default=False)
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
@@ -117,6 +113,9 @@ class SequenceAnnotation(Annotation):
     label = models.ForeignKey(Label, on_delete=models.CASCADE)
     start_offset = models.IntegerField()
     end_offset = models.IntegerField()
+
+    connections = models.TextField(blank=True)
+
 
     def clean(self):
         if self.start_offset >= self.end_offset:
@@ -202,3 +201,14 @@ def delete_linked_project(sender, instance, using, **kwargs):
         project = Project.objects.get(pk=projectInstance.pk)
         user.projects.remove(project)
         user.save()
+
+@receiver(pre_delete, sender=SequenceAnnotation)
+def delete_annotation(sender, instance, using, **kwargs):
+    deleteAnnotationId = instance.id
+    annotations = SequenceAnnotation.objects.all()
+    for annotation in annotations:
+        connections = annotation.connections.split(',')
+        if str(deleteAnnotationId) in connections:
+            connections.remove(str(deleteAnnotationId))
+            annotation.connections = ','.join(connections)
+            annotation.save()
