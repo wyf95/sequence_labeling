@@ -119,15 +119,6 @@ export default {
 .highlight:hover .delete {
   display: block;
 }
-.highlight .next {
-  top:-15px;
-  right:-13px;
-  position:absolute;
-  display: none;
-}
-.highlight:hover .next {
-  display: block;
-}
 .highlight__content {
   display: flex;
   flex-wrap: wrap;

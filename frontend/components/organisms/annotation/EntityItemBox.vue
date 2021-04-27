@@ -180,9 +180,9 @@ export default {
           this.addConnection(from, to)
         })
         // 双击连线 删除
-        this.jsPlumb.bind('dblclick', (conn, originalEvent) => {
-          this.jsPlumb.deleteConnection(conn)
-          this.deleteConnection(conn.sourceId, conn.targetId)
+        this.jsPlumb.bind('dblclick', (evt, originalEvent) => {
+          this.jsPlumb.deleteConnection(evt)
+          this.deleteConnection(evt.sourceId, evt.targetId)
         })
         // 连线
         this.jsPlumb.bind("beforeDrop", (evt) => {
@@ -203,6 +203,7 @@ export default {
     },
     // 添加连线
     addConnection(from, to) {
+      this.conn.push({from: from, to: to})
       for (var i = 0; i < this.entities.length; i++){
         let node = this.entities[i]
         if (from === String(node.id)) {
@@ -223,7 +224,7 @@ export default {
           let connections = node.connections.replace(to, "")
           connections = connections.replace(",,", ",")
           if (connections[0] == ',') {
-            console.log(connections.slice(1))
+            connections = connections.slice(1)
           }
           if (connections[connections.length-1] == ',') {
             connections = connections.slice(0,-1)
