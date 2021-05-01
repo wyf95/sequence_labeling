@@ -9,7 +9,7 @@
       :label="chunk.label"
       :color="chunk.color"
       :labels="labels"
-      @remove="deleteAnnotation(chunk.id)"
+      @remove="removeEntity(chunk.id)"
       @update="updateEntity($event.id, chunk.id)"
     />
     <v-menu
@@ -71,17 +71,17 @@ export default {
       default: () => ([]),
       required: true
     },
-    deleteAnnotation: {
-      type: Function,
-      default: () => ([]),
-      required: true
-    },
     updateEntity: {
       type: Function,
       default: () => ([]),
       required: true
     },
     addEntity: {
+      type: Function,
+      default: () => ([]),
+      required: true
+    },
+    removeEntity: {
       type: Function,
       default: () => ([]),
       required: true
@@ -124,10 +124,10 @@ export default {
       }
       // add the rest of text.
       chunks = chunks.concat(this.makeChunks(this.text.slice(startOffset, this.text.length)))
-
+      
       // 加载连线
       this.$nextTick(() => {
-        this.loadNode()
+        this.loadChart()
       })
 
       return chunks
@@ -141,14 +141,21 @@ export default {
       return obj
     }
   },
+
+  mounted() {
+    let that = this
+    // 窗口大小变化，重新绘制
+    window.onresize = function() {
+      that.loadChart()
+    }
+  },
   
+  // 导入jsplumb配置
   mixins: [easyFlowMixin],
 
   methods: {
-    loadNode() {
-      if (this.jsPlumb != null) {
-        this.jsPlumb.deleteEveryEndpoint()
-      }
+    loadChart() {
+      // 添加连线信息
       this.conn = []
       for (let i = 0; i < this.entities.length; i++) {
         const node = this.entities[i]
@@ -157,12 +164,38 @@ export default {
           this.conn.push({from: String(node.id), to: connections[j]})
         }
       }
-      this.$nextTick(() => {
+      // 删除现有
+      if (this.jsPlumb !== null) {
+        this.jsPlumb.reset()
+      } else {
         this.jsPlumb = jsPlumb.getInstance()
-          this.$nextTick(() => {
-            this.jsPlumbInit()
-        })
+      }
+      // 初始化jsplumb
+      this.$nextTick(() => {
+        this.jsPlumbInit()
       })
+    },
+
+    // 加载节点
+    loadNode() {
+      for (let i = 0; i < this.entities.length; i++) {
+        const node = this.entities[i];
+        // 设置源点，可以拖出线连接其他节点
+        this.jsPlumb.makeSource(String(node.id), lodash.merge(this.jsplumbSourceOptions, {}))
+        // 设置目标点，其他源点拖出的线可以连接该节点
+        this.jsPlumb.makeTarget(String(node.id), this.jsplumbTargetOptions)
+      }
+    },
+    // 加载连线
+    loadLine() {
+      for (var i = 0; i < this.conn.length; i++){
+        let node = this.conn[i]
+        var params = {
+          source: node.from,
+          target: node.to
+        }
+        this.jsPlumb.connect(params, this.jsplumbConnectOptions)
+      }
     },
 
     jsPlumbInit() {
@@ -171,7 +204,8 @@ export default {
         this.jsPlumb.importDefaults(this.jsplumbSetting)
         // 会使整个jsPlumb立即重绘。
         this.jsPlumb.setSuspendDrawing(false, true)
-        // 初始化节点
+        // 初始化节点与连线
+        this.loadNode()
         this.loadLine()
         // 连线
         this.jsPlumb.bind("connection", (evt) => {
@@ -184,7 +218,7 @@ export default {
           this.jsPlumb.deleteConnection(evt)
           this.deleteConnection(evt.sourceId, evt.targetId)
         })
-        // 连线
+        // 连线条件
         this.jsPlumb.bind("beforeDrop", (evt) => {
           let from = evt.sourceId
           let to = evt.targetId
@@ -201,6 +235,7 @@ export default {
         })
       })
     },
+
     // 添加连线
     addConnection(from, to) {
       this.conn.push({from: from, to: to})
@@ -216,7 +251,7 @@ export default {
         }
       }
     },
-    // 删除线
+    // 删除连线
     deleteConnection(from, to) {
       for (var i = 0; i < this.entities.length; i++){
         let node = this.entities[i]
@@ -234,32 +269,13 @@ export default {
         }
       }
       this.conn = this.conn.filter(function (line) {
-          if (line.from == from && line.to == to) {
-              return false
-          }
-          return true
+        if (line.from == from && line.to == to) {
+            return false
+        }
+        return true
       })
     },
-    // 加载线
-    loadLine() {
-      // 设置为节点
-      for (var i = 0; i < this.entities.length; i++){
-        let node = this.entities[i]
-        // 设置源点，可以拖出线连接其他节点
-        this.jsPlumb.makeSource(String(node.id), lodash.merge(this.jsplumbSourceOptions, {}))
-        // 设置目标点，其他源点拖出的线可以连接该节点
-        this.jsPlumb.makeTarget(String(node.id), this.jsplumbTargetOptions)
-      }
-      // 初始化连线
-      for (var i = 0; i < this.conn.length; i++){
-        let node = this.conn[i]
-        var params = {
-          source: node.from,
-          target: node.to
-        }
-        this.jsPlumb.connect(params, this.jsplumbConnectOptions)
-      }
-    },
+
     // 是否具有该线
     hasLine(from, to) {
       for (var i = 0; i < this.conn.length; i++) {

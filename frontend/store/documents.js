@@ -66,6 +66,15 @@ export const mutations = {
   },
   deleteAnnotation(state, annotationId) {
     state.items[state.current].annotations = state.items[state.current].annotations.filter(item => item.id !== annotationId)
+    for (var i = 0; i < state.items[state.current].annotations.length; i++){
+      let node = state.items[state.current].annotations[i]
+      let connections = node.connections.split(",")
+      var index = connections.indexOf(String(annotationId))
+      if (index > -1) {
+        connections.splice(index, 1)
+      }
+      state.items[state.current].annotations[i].connections = connections.join(',')
+    }
   },
   updateAnnotation(state, payload) {
     const item = state.items[state.current].annotations.find(item => item.id === payload.id)

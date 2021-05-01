@@ -384,13 +384,16 @@ class JSONPainter(object):
         serializer = DocumentSerializer(documents, many=True)
         data = []
         for d in serializer.data:
-            # d['meta'] = json.loads(d['meta'])
             for a in d['annotations']:
                 a['label'] = Label.objects.get(id=a['label']).text   
                 a['user'] = User.objects.get(id=a['user']).username
                 a.pop('document')
                 a.pop('created_at')
                 a.pop('updated_at')
+                connections = a['connections'].split(',')
+                while "" in connections:
+                    connections.remove("")
+                a['connections'] = list(map(int, connections))
             d.pop('meta')
             data.append(d)
         return data

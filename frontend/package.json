@@ -19,16 +19,15 @@
     "chart.js": "^2.9.3",
     "codemirror": "^5.55.0",
     "js-cookie": "^2.2.1",
+    "lodash": "^4.17.15",
     "nuxt": "^2.15.4",
     "nuxt-i18n": "^6.13.12",
     "papaparse": "^5.2.0",
     "tui-editor": "^1.4.10",
     "vue-chartjs": "^3.5.0",
     "vue-shortkey": "^3.1.7",
-    "vue-youtube": "^1.4.0",
     "vuetify": "^2.3.4",
-    "yarn": "^1.22.4",
-    "lodash": "^4.17.15"
+    "yarn": "^1.22.4"
   },
   "devDependencies": {
     "@nuxtjs/eslint-config": "^3.0.0",

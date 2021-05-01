@@ -4,9 +4,9 @@
     :labels="items"
     :text="currentDoc.text"
     :entities="currentDoc.annotations"
-    :delete-annotation="removeEntity"
     :update-entity="updateEntity"
     :add-entity="addEntity"
+    :remove-entity="removeEntity"
     @updateEntityConn="updateEntityConn"
   />
 </template>
