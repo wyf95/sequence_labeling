@@ -7,6 +7,7 @@ from .views import ProjectList, ProjectDetail
 from .views import LabelList, LabelDetail, ApproveLabelsAPI, LabelUploadAPI
 from .views import DocumentList, DocumentDetail
 from .views import AnnotationList, AnnotationDetail
+from .views import ConnectionList, ConnectionDetail
 from .views import TextUploadAPI, TextDownloadAPI, CloudUploadAPI
 from .views import StatisticsAPI
 from .views import RoleMappingList, RoleMappingDetail, Roles
@@ -39,6 +40,10 @@ urlpatterns = [
          AnnotationList.as_view(), name='annotation_list'),
     path('projects/<int:project_id>/docs/<int:doc_id>/annotations/<int:annotation_id>',
          AnnotationDetail.as_view(), name='annotation_detail'),
+    path('projects/<int:project_id>/docs/<int:doc_id>/connections',
+         ConnectionList.as_view(), name='connection_list'),
+    path('projects/<int:project_id>/docs/<int:doc_id>/connections/<int:connection_id>',
+         ConnectionDetail.as_view(), name='connection_detail'),
     path('projects/<int:project_id>/docs/upload',
          TextUploadAPI.as_view(), name='doc_uploader'),
     path('projects/<int:project_id>/docs/download',

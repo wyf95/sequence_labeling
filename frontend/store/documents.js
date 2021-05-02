@@ -1,5 +1,6 @@
 import DocumentService from '@/services/document.service'
 import AnnotationService from '@/services/annotation.service'
+import ConnectionService from '@/services/connection.service'
 
 export const state = () => ({
   items: [],
@@ -66,24 +67,24 @@ export const mutations = {
   },
   deleteAnnotation(state, annotationId) {
     state.items[state.current].annotations = state.items[state.current].annotations.filter(item => item.id !== annotationId)
-    for (var i = 0; i < state.items[state.current].annotations.length; i++){
-      let node = state.items[state.current].annotations[i]
-      let connections = node.connections.split(",")
-      var index = connections.indexOf(String(annotationId))
-      if (index > -1) {
-        connections.splice(index, 1)
-      }
-      state.items[state.current].annotations[i].connections = connections.join(',')
-    }
+    state.items[state.current].connections = state.items[state.current].connections.filter(item => item.source !== annotationId && item.to !== annotationId)
   },
   updateAnnotation(state, payload) {
     const item = state.items[state.current].annotations.find(item => item.id === payload.id)
     Object.assign(item, payload)
   },
-  updateAnnotationConn(state, payload) {
-    const item = state.items[state.current].annotations.find(item => item.id === payload.id)
+
+  addConnection(state, payload) {
+    state.items[state.current].connections.push(payload)
+  },
+  deleteConnection(state, connectionId) {
+    state.items[state.current].connections = state.items[state.current].connections.filter(item => item.id !== connectionId)
+  },
+  updateConnection(state, payload) {
+    const item = state.items[state.current].connections.find(item => item.id === payload.id)
     Object.assign(item, payload)
   },
+
   updateSearchOptions(state, payload) {
     state.searchOptions = Object.assign(state.searchOptions, payload)
   },
@@ -101,7 +102,6 @@ export const mutations = {
 export const actions = {
   getDocumentList({ commit, state }, payload) {
     commit('setLoading', true)
-    // payload = Object.assign(payload, state.searchOptions)
     return DocumentService.getDocumentList(payload)
       .then((response) => {
         commit('setDocumentList', response.data.results)
@@ -191,16 +191,6 @@ export const actions = {
         alert(error)
       })
   },
-  updateAnnotationConn({ commit, state }, payload) {
-    const documentId = state.items[state.current].id
-    AnnotationService.updateAnnotationConn(payload.projectId, documentId, payload.annotationId, payload)
-      .then((response) => {
-        commit('updateAnnotationConn', response.data)
-      })
-      .catch((error) => {
-        alert(error)
-      })
-  },
   deleteAnnotation({ commit, state }, payload) {
     const documentId = state.items[state.current].id
     AnnotationService.deleteAnnotation(payload.projectId, documentId, payload.annotationId)
@@ -211,6 +201,39 @@ export const actions = {
         alert(error)
       })
   },
+
+  addConnection({ commit, state }, payload) {
+    // var conn = state.items[state.current].connections.filter(item => item.source === payload.source && item.to === payload.to)
+    const documentId = state.items[state.current].id
+    ConnectionService.addConnection(payload.projectId, documentId, payload)
+      .then((response) => {
+        commit('addConnection', response.data)
+      })
+      .catch((error) => {
+        // alert(error)
+      })
+  },
+  updateConnection({ commit, state }, payload) {
+    const documentId = state.items[state.current].id
+    ConnectionService.updateConnection(payload.projectId, documentId, payload.connectionId, payload)
+      .then((response) => {
+        commit('updateConnection', response.data)
+      })
+      .catch((error) => {
+        // alert(error)
+      })
+  },
+  deleteConnection({ commit, state }, payload) {
+    const documentId = state.items[state.current].id
+    ConnectionService.deleteConnection(payload.projectId, documentId, payload.connectionId)
+      .then((response) => {
+        commit('deleteConnection', payload.connectionId)
+      })
+      .catch((error) => {
+        // alert(error)
+      })
+  },
+
   approve({ commit, getters }, payload) {
     const documentId = getters.currentDoc.id
     const data = {

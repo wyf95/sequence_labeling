@@ -232,6 +232,51 @@ class AnnotationDetail(generics.RetrieveUpdateDestroyAPIView):
         self.queryset = model.objects.all()
         return self.queryset
 
+class ConnectionList(generics.ListCreateAPIView):
+    permission_classes = [IsAuthenticated & IsInProjectOrAdmin]
+    swagger_schema = None
+
+    def get_serializer_class(self):
+        project = get_object_or_404(Project, pk=self.kwargs['project_id'])
+        self.serializer_class = project.get_connection_serializer()
+        return self.serializer_class
+
+    def get_queryset(self):
+        project = get_object_or_404(Project, pk=self.kwargs['project_id'])
+        model = project.get_connection_class()
+
+        queryset = model.objects.filter(document=self.kwargs['doc_id'])
+
+        return queryset
+
+    def create(self, request, *args, **kwargs):
+        request.data['document'] = self.kwargs['doc_id']
+        return super().create(request, args, kwargs)
+
+    def perform_create(self, serializer):
+        serializer.save(document_id=self.kwargs['doc_id'])
+
+
+class ConnectionDetail(generics.RetrieveUpdateDestroyAPIView):
+    lookup_url_kwarg = 'connection_id'
+    swagger_schema = None
+
+    def get_permissions(self):
+        project = get_object_or_404(Project, pk=self.kwargs['project_id'])
+        self.permission_classes = [IsAuthenticated & IsInProjectOrAdmin]
+        return super().get_permissions()
+
+    def get_serializer_class(self):
+        project = get_object_or_404(Project, pk=self.kwargs['project_id'])
+        self.serializer_class = project.get_connection_serializer()
+        return self.serializer_class
+
+    def get_queryset(self):
+        project = get_object_or_404(Project, pk=self.kwargs['project_id'])
+        model = project.get_connection_class()
+        self.queryset = model.objects.all()
+        return self.queryset
+
 
 class TextUploadAPI(APIView):
     parser_classes = (MultiPartParser,)

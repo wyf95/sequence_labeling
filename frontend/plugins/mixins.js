@@ -130,8 +130,8 @@ export const easyFlowMixin = {
                 filter: '.flow-node-drag',
                 filterExclude: false,
                 // 是否允许自己连接自己
+                allowLoopback: false,
                 anchor: ['Top'],
-                allowLoopback: true,
                 dropOptions: {hoverClass: 'ef-drop-hover'}
             }
         }

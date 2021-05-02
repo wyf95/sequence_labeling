@@ -71,6 +71,11 @@ export default {
       default: () => ([]),
       required: true
     },
+    connections: {
+      type: Array,
+      default: () => ([]),
+      required: true
+    },
     updateEntity: {
       type: Function,
       default: () => ([]),
@@ -85,6 +90,22 @@ export default {
       type: Function,
       default: () => ([]),
       required: true
+    },
+
+    updateConnection: {
+      type: Function,
+      default: () => ([]),
+      required: true
+    },
+    addConnection: {
+      type: Function,
+      default: () => ([]),
+      required: true
+    },
+    removeConnection: {
+      type: Function,
+      default: () => ([]),
+      required: true
     }
   },
   data() {
@@ -94,8 +115,7 @@ export default {
       y: 0,
       start: 0,
       end: 0,
-      jsPlumb: null,
-      conn: []
+      jsPlumb: null
     }
   },
 
@@ -155,15 +175,6 @@ export default {
 
   methods: {
     loadChart() {
-      // 添加连线信息
-      this.conn = []
-      for (let i = 0; i < this.entities.length; i++) {
-        const node = this.entities[i]
-        let connections = node.connections.split(",")
-        for (var j = 0; j < connections.length && connections[j] !== ""; j++) {
-          this.conn.push({from: String(node.id), to: connections[j]})
-        }
-      }
       // 删除现有
       if (this.jsPlumb !== null) {
         this.jsPlumb.reset()
@@ -188,11 +199,11 @@ export default {
     },
     // 加载连线
     loadLine() {
-      for (var i = 0; i < this.conn.length; i++){
-        let node = this.conn[i]
+      for (var i = 0; i < this.connections.length; i++){
+        let node = this.connections[i]
         var params = {
-          source: node.from,
-          target: node.to
+          source: String(node.source),
+          target: String(node.to)
         }
         this.jsPlumb.connect(params, this.jsplumbConnectOptions)
       }
@@ -204,19 +215,19 @@ export default {
         this.jsPlumb.importDefaults(this.jsplumbSetting)
         // 会使整个jsPlumb立即重绘。
         this.jsPlumb.setSuspendDrawing(false, true)
-        // 初始化节点与连线
+        // // 初始化节点与连线
         this.loadNode()
         this.loadLine()
         // 连线
         this.jsPlumb.bind("connection", (evt) => {
           let from = evt.source.id
           let to = evt.target.id
-          this.addConnection(from, to)
+          this.addLine(from, to)
         })
         // 双击连线 删除
         this.jsPlumb.bind('dblclick', (evt, originalEvent) => {
           this.jsPlumb.deleteConnection(evt)
-          this.deleteConnection(evt.sourceId, evt.targetId)
+          this.deleteLine(evt.sourceId, evt.targetId)
         })
         // 连线条件
         this.jsPlumb.bind("beforeDrop", (evt) => {
@@ -236,51 +247,24 @@ export default {
       })
     },
 
-    // 添加连线
-    addConnection(from, to) {
-      this.conn.push({from: from, to: to})
-      for (var i = 0; i < this.entities.length; i++){
-        let node = this.entities[i]
-        if (from === String(node.id)) {
-          if (node.connections === ""){
-            this.$emit('updateEntityConn', node.id, to)
-          } else {
-            this.$emit('updateEntityConn', node.id, node.connections + ',' + to)
-          }
-          break
-        }
-      }
+    // // 添加连线
+    addLine(from, to) {
+      this.addConnection(Number(from), Number(to))
     },
-    // 删除连线
-    deleteConnection(from, to) {
-      for (var i = 0; i < this.entities.length; i++){
-        let node = this.entities[i]
-        if (from === String(node.id)) {
-          let connections = node.connections.replace(to, "")
-          connections = connections.replace(",,", ",")
-          if (connections[0] == ',') {
-            connections = connections.slice(1)
-          }
-          if (connections[connections.length-1] == ',') {
-            connections = connections.slice(0,-1)
-          }
-          this.$emit('updateEntityConn', node.id, connections)
-          break
-        }
+    // // 删除连线
+    deleteLine(from, to) {
+      var conn = this.connections.filter(item => item.source === Number(from) && item.to === Number(to))
+      if (conn.length === 1) {
+        this.removeConnection(conn[0].id)
       }
-      this.conn = this.conn.filter(function (line) {
-        if (line.from == from && line.to == to) {
-            return false
-        }
-        return true
-      })
     },
 
     // 是否具有该线
     hasLine(from, to) {
-      for (var i = 0; i < this.conn.length; i++) {
-        var line = this.conn[i]
-        if (line.from === from && line.to === to) {
+      var conn = this.jsPlumb.getConnections()
+      for (let i = 0; i < conn.length; i++) {
+        const c = conn[i];
+        if(c.sourceId === from && c.targetId === to) {
           return true
         }
       }

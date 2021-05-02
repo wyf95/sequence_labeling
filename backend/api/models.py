@@ -41,6 +41,13 @@ class Project(models.Model):
     def get_annotation_class(self):
         return SequenceAnnotation
 
+    def get_connection_serializer(self):
+        from .serializers import ConnectionSerializer
+        return ConnectionSerializer
+
+    def get_connection_class(self):
+        return Connection
+
     def get_storage(self, data):
         from .utils import SequenceLabelingStorage
         return SequenceLabelingStorage(data, self)
@@ -86,7 +93,6 @@ class Label(models.Model):
             ('project', 'text'),
         )
 
-
 class Document(models.Model):
     text = models.TextField()
     project = models.ForeignKey(Project, related_name='documents', on_delete=models.CASCADE)
@@ -97,7 +103,6 @@ class Document(models.Model):
 
     def __str__(self):
         return self.text[:50]
-
 
 class Annotation(models.Model):
     objects = AnnotationManager()
@@ -114,8 +119,6 @@ class SequenceAnnotation(Annotation):
     start_offset = models.IntegerField()
     end_offset = models.IntegerField()
 
-    connections = models.TextField(blank=True)
-
 
     def clean(self):
         if self.start_offset >= self.end_offset:
@@ -123,6 +126,14 @@ class SequenceAnnotation(Annotation):
 
     class Meta:
         unique_together = ('document', 'user', 'label', 'start_offset', 'end_offset')
+
+class Connection(models.Model):
+    document = models.ForeignKey(Document, related_name='seq_connections', on_delete=models.CASCADE)
+    source = models.ForeignKey(SequenceAnnotation, related_name='conn_source', on_delete=models.CASCADE)
+    to = models.ForeignKey(SequenceAnnotation, related_name='conn_to', on_delete=models.CASCADE)
+
+    class Meta:
+        unique_together = ('document', 'source', 'to')
 
 
 class Role(models.Model):
@@ -201,14 +212,3 @@ def delete_linked_project(sender, instance, using, **kwargs):
         project = Project.objects.get(pk=projectInstance.pk)
         user.projects.remove(project)
         user.save()
-
-@receiver(pre_delete, sender=SequenceAnnotation)
-def delete_annotation(sender, instance, using, **kwargs):
-    deleteAnnotationId = instance.id
-    annotations = SequenceAnnotation.objects.all()
-    for annotation in annotations:
-        connections = annotation.connections.split(',')
-        if str(deleteAnnotationId) in connections:
-            connections.remove(str(deleteAnnotationId))
-            annotation.connections = ','.join(connections)
-            annotation.save()

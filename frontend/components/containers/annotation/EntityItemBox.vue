@@ -4,10 +4,13 @@
     :labels="items"
     :text="currentDoc.text"
     :entities="currentDoc.annotations"
+    :connections="currentDoc.connections"
     :update-entity="updateEntity"
     :add-entity="addEntity"
     :remove-entity="removeEntity"
-    @updateEntityConn="updateEntityConn"
+    :remove-connection="removeConn"
+    :update-connection="updateConn"
+    :add-connection="addConn"
   />
 </template>
 
@@ -37,7 +40,7 @@ export default {
 
   methods: {
     ...mapActions('labels', ['getLabelList']),
-    ...mapActions('documents', ['getDocumentList', 'deleteAnnotation', 'updateAnnotation', 'updateAnnotationConn', 'addAnnotation']),
+    ...mapActions('documents', ['getDocumentList', 'deleteAnnotation', 'updateAnnotation', 'addAnnotation', 'deleteConnection', 'updateConnection', 'addConnection']),
     removeEntity(annotationId) {
       const payload = {
         annotationId,
@@ -53,14 +56,6 @@ export default {
       }
       this.updateAnnotation(payload)
     },
-    updateEntityConn(annotationId, conn){
-      const payload = {
-        annotationId,
-        connections: conn,
-        projectId: this.$route.params.id
-      }
-      this.updateAnnotationConn(payload)
-    },
     addEntity(startOffset, endOffset, labelId) {
       const payload = {
         start_offset: startOffset,
@@ -69,6 +64,29 @@ export default {
         projectId: this.$route.params.id
       }
       this.addAnnotation(payload)
+    },
+
+    removeConn(connectionId) {
+      const payload = {
+        connectionId,
+        projectId: this.$route.params.id
+      }
+      this.deleteConnection(payload)
+    },
+    updateConn(connectionId) {
+      const payload = {
+        connectionId,
+        projectId: this.$route.params.id
+      }
+      this.updateConnection(payload)
+    },
+    addConn(source, to) {
+      const payload = {
+        source: source,
+        to: to,
+        projectId: this.$route.params.id
+      }
+      this.addConnection(payload)
     }
   }
 }

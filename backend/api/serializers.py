@@ -5,7 +5,7 @@ from rest_framework import serializers
 from rest_framework.exceptions import ValidationError
 
 from .models import Label, Project, Document, RoleMapping, Role
-from .models import SequenceAnnotation
+from .models import SequenceAnnotation, Connection
 
 
 class UserSerializer(serializers.ModelSerializer):
@@ -57,6 +57,7 @@ class LabelSerializer(serializers.ModelSerializer):
 
 class DocumentSerializer(serializers.ModelSerializer):
     annotations = serializers.SerializerMethodField()
+    connections = serializers.SerializerMethodField()
     annotation_approver = serializers.SerializerMethodField()
 
     def get_annotations(self, instance):
@@ -68,6 +69,15 @@ class DocumentSerializer(serializers.ModelSerializer):
         annotations = model.objects.filter(document=instance.id)
         serializer = serializer(annotations, many=True)
         return serializer.data
+    
+    def get_connections(self, instance):
+        request = self.context.get('request')
+        project = instance.project
+        model = project.get_connection_class()
+        serializer = project.get_connection_serializer()
+        connections = model.objects.filter(document=instance.id)
+        serializer = serializer(connections, many=True)
+        return serializer.data
 
     @classmethod
     def get_annotation_approver(cls, instance):
@@ -76,7 +86,7 @@ class DocumentSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Document
-        fields = ('id', 'text', 'annotations', 'meta', 'annotation_approver')
+        fields = ('id', 'text', 'annotations', 'connections', 'meta', 'annotation_approver')
 
 
 class ApproverSerializer(DocumentSerializer):
@@ -131,14 +141,20 @@ class ProjectFilteredPrimaryKeyRelatedField(serializers.PrimaryKeyRelatedField):
 
 
 class SequenceAnnotationSerializer(serializers.ModelSerializer):
-    #label = ProjectFilteredPrimaryKeyRelatedField(queryset=Label.objects.all())
     label = serializers.PrimaryKeyRelatedField(queryset=Label.objects.all())
     document = serializers.PrimaryKeyRelatedField(queryset=Document.objects.all())
 
     class Meta:
         model = SequenceAnnotation
-        fields = ('id', 'label', 'start_offset', 'end_offset', 'user', 'document', 'created_at', 'updated_at', 'connections')
+        fields = ('id', 'label', 'start_offset', 'end_offset', 'user', 'document', 'created_at', 'updated_at')
         read_only_fields = ('user',)
+
+class ConnectionSerializer(serializers.ModelSerializer):
+    document = serializers.PrimaryKeyRelatedField(queryset=Document.objects.all())
+
+    class Meta:
+        model = Connection
+        fields = ('id', 'document', 'source', 'to')
 
 
 class RoleSerializer(serializers.ModelSerializer):
