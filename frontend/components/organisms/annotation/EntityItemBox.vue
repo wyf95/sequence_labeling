@@ -11,6 +11,7 @@
       :labels="labels"
       @remove="removeEntity(chunk.id)"
       @update="updateEntity($event.id, chunk.id)"
+      @showConn="clickShow(chunk.id)"
     />
     <v-menu
       v-model="showMenu"
@@ -115,7 +116,9 @@ export default {
       y: 0,
       start: 0,
       end: 0,
-      jsPlumb: null
+      jsPlumb: null,
+      showId: 0,
+      showAll: true // true-全部显示 false-只显示showId
     }
   },
 
@@ -218,6 +221,7 @@ export default {
         // // 初始化节点与连线
         this.loadNode()
         this.loadLine()
+        this.showConnection()
         // 连线
         this.jsPlumb.bind("connection", (evt) => {
           let from = evt.source.id
@@ -273,6 +277,34 @@ export default {
     // 是否含有相反的线
     hashOppositeLine(from, to) {
       return this.hasLine(to, from)
+    },
+    clickShow(id) {
+      if (this.showId === id) {
+        this.showAll = this.showAll ? false : true
+      } else {
+        this.showId = id
+        this.showAll = false
+      }
+      this.showConnection()
+    },
+    // 显示/隐藏连线
+    showConnection() {
+      if (this.showAll) {
+        this.showConn(true)
+      } else {
+        this.showConn(false)
+        this.jsPlumb.show(String(this.showId))
+      }
+    },
+    showConn(option) {
+      for (let i = 0; i < this.entities.length; i++) {
+        const node = this.entities[i];
+        if (option) {
+          this.jsPlumb.show(String(node.id))
+        } else {
+          this.jsPlumb.hide(String(node.id))
+        }
+      }
     },
 
     makeChunks(text) {

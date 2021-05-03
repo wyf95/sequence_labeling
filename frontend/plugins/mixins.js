@@ -5,7 +5,7 @@ export const easyFlowMixin = {
                 // 动态锚点、位置自适应
                 Anchors: ['Top', 'TopCenter', 'TopRight', 'TopLeft', 'Right', 'RightMiddle', 'Bottom', 'BottomCenter', 'BottomRight', 'BottomLeft', 'Left', 'LeftMiddle'],
                 // 容器ID
-                Container: 'efContainer',
+                // Container: 'efContainer',
                 // 连线的样式，直线或者曲线等，可选值:  StateMachine、Flowchart，Bezier、Straight
                 Connector: ['Bezier', {curviness: 50}],
                 // Connector: ['Straight', {stub: 0, gap: 1}],
@@ -69,27 +69,12 @@ export const easyFlowMixin = {
                         location: 1, // 位置，建议使用0～1之间
                         direction: 1, // 方向，默认值为1（表示向前），可选-1（表示向后）
                         foldback: 0.623 // 折回，也就是尾翼的角度，默认0.623，当为1时，为正三角
-                    }],
-                    // ['Diamond', {
-                    //     events: {
-                    //         dblclick: function (diamondOverlay, originalEvent) {
-                    //             console.log('double click on diamond overlay for : ' + diamondOverlay.component)
-                    //         }
-                    //     }
-                    // }],
-                    ['Label', {
-                        label: '',
-                        location: 0.1,
-                        cssClass: 'aLabel'
                     }]
                 ],
                 // 绘制图的模式 svg、canvas
                 RenderMode: 'svg',
                 // 鼠标滑过线的样式
                 HoverPaintStyle: {stroke: '#b0b2b5', strokeWidth: 1},
-                // 滑过锚点效果
-                // EndpointHoverStyle: {fill: 'red'}
-                Scope: 'jsPlumb_DefaultScope' // 范围，具有相同scope的点才可连接
             },
             /**
              * 连线参数
@@ -132,7 +117,6 @@ export const easyFlowMixin = {
                 // 是否允许自己连接自己
                 allowLoopback: false,
                 anchor: ['Top'],
-                dropOptions: {hoverClass: 'ef-drop-hover'}
             }
         }
     }

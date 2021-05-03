@@ -6,7 +6,7 @@
   >
     <template v-slot:activator="{ on }">
       <span :style="{ borderColor: color }" class="highlight bottom flow-node-drag" v-on="on" :id="lid">
-        <span class="highlight__content flow-node-drag">{{ content }}<i/><v-icon class="delete" @click.stop="remove">mdi-close-circle</v-icon></span><span :data-label="label" :style="{ backgroundColor: color, color: textColor }" class="highlight__label flow-node-drag" />
+        <span class="highlight__content flow-node-drag">{{ content }}<i/><v-icon class="delete" @click.stop="remove">mdi-close-circle</v-icon><v-icon class="information" @click.stop="showConn">mdi-information-outline</v-icon></span><span :data-label="label" :style="{ backgroundColor: color, color: textColor }" class="highlight__label flow-node-drag" />
       </span>
     </template>
     <v-list
@@ -83,6 +83,9 @@ export default {
     },
     remove() {
       this.$emit('remove')
+    },
+    showConn() {
+      this.$emit('showConn')
     }
   }
 }
@@ -119,6 +122,15 @@ export default {
 .highlight:hover .delete {
   display: block;
 }
+.highlight .information {
+  top:-15px;
+  right:-13px;
+  position:absolute;
+  display: none;
+}
+.highlight:hover .information {
+  display: block;
+}
 .highlight__content {
   display: flex;
   flex-wrap: wrap;
@@ -153,4 +165,5 @@ export default {
 .newline {
   width: 100%;
 }
+
 </style>
