@@ -154,7 +154,7 @@ class ConnectionSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Connection
-        fields = ('id', 'document', 'source', 'to')
+        fields = ('id', 'document', 'source', 'to', 'relation')
 
 
 class RoleSerializer(serializers.ModelSerializer):

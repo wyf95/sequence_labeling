@@ -24,7 +24,7 @@
       <v-list
         dense
         min-width="150"
-        max-height="400"
+        max-height="300"
         class="overflow-y-auto"
       >
         <v-list-item
@@ -43,13 +43,39 @@
         </v-list-item>
       </v-list>
     </v-menu>
+
+    <v-menu
+      v-model="showRelations"
+      :position-x="x"
+      :position-y="y"
+      absolute
+      offset-y
+      style=""
+    >
+      <v-list
+        dense
+        min-width="100"
+        max-height="300"
+        class="overflow-y-auto"
+      >
+        <v-list-item
+          v-for="(relation, i) in relations"
+          :key="i"
+          @click="assignRelation(relation)"
+        >
+          <v-list-item-content>
+            <v-list-item-title v-text="relation" />
+          </v-list-item-content>
+        </v-list-item>
+      </v-list>
+    </v-menu>
   </div>
 </template>
 
 <script>
+import '~/plugins/jsplumb.js'
 import EntityItem from '~/components/molecules/EntityItem'
 import lodash from 'lodash'
-import '~/plugins/jsplumb.js'
 import { easyFlowMixin } from '~/plugins/mixins.js'
 
 export default {
@@ -118,7 +144,11 @@ export default {
       end: 0,
       jsPlumb: null,
       showId: 0,
-      showAll: true // true-全部显示 false-只显示showId
+      showAll: true, // true-全部显示 false-只显示showId
+      clickConn: null,
+      showRelations: false,
+      relations: ['', 'attOf', 'valueOf'],
+      timer: null
     }
   },
 
@@ -206,7 +236,8 @@ export default {
         let node = this.connections[i]
         var params = {
           source: String(node.source),
-          target: String(node.to)
+          target: String(node.to),
+          label: node.relation
         }
         this.jsPlumb.connect(params, this.jsplumbConnectOptions)
       }
@@ -228,8 +259,19 @@ export default {
           let to = evt.target.id
           this.addLine(from, to)
         })
+        // 单击连线 设置relation
+        this.jsPlumb.bind('click', (evt, originalEvent) => {
+          clearTimeout(this.timer)
+          this.timer = setTimeout(() => {
+            this.x = originalEvent.clientX || originalEvent.changedTouches[0].clientX
+            this.y = originalEvent.clientY || originalEvent.changedTouches[0].clientY
+            this.clickConn = evt
+            this.showRelations = true
+          }, 200)
+        })
         // 双击连线 删除
         this.jsPlumb.bind('dblclick', (evt, originalEvent) => {
+          clearTimeout(this.timer)
           this.jsPlumb.deleteConnection(evt)
           this.deleteLine(evt.sourceId, evt.targetId)
         })
@@ -258,7 +300,7 @@ export default {
     // // 删除连线
     deleteLine(from, to) {
       var conn = this.connections.filter(item => item.source === Number(from) && item.to === Number(to))
-      if (conn.length === 1) {
+      if (conn.length > 0) {
         this.removeConnection(conn[0].id)
       }
     },
@@ -278,6 +320,7 @@ export default {
     hashOppositeLine(from, to) {
       return this.hasLine(to, from)
     },
+    // 设置显示信息
     clickShow(id) {
       if (this.showId === id) {
         this.showAll = this.showAll ? false : true
@@ -305,6 +348,25 @@ export default {
           this.jsPlumb.hide(String(node.id))
         }
       }
+    },
+    assignRelation(relation) {
+      // 更新显示
+      this.clickConn.setLabel(relation)
+      if (relation === '') {
+        this.clickConn.removeClass('flowLabel')
+        this.clickConn.addClass('emptyFlowLabel')
+      } else {
+        this.clickConn.removeClass('emptyFlowLabel')
+        this.clickConn.addClass('flowLabel')
+      }
+      // 更新数据
+      var sourceId = Number(this.clickConn.sourceId)
+      var targetId = Number(this.clickConn.targetId)
+      var conn = this.connections.filter(item => item.source === sourceId && item.to === targetId)
+      if (conn.length > 0) {
+        this.updateConnection(conn[0].id, relation)
+      }
+      this.showRelations = false
     },
 
     makeChunks(text) {

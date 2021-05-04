@@ -131,6 +131,7 @@ class Connection(models.Model):
     document = models.ForeignKey(Document, related_name='seq_connections', on_delete=models.CASCADE)
     source = models.ForeignKey(SequenceAnnotation, related_name='conn_source', on_delete=models.CASCADE)
     to = models.ForeignKey(SequenceAnnotation, related_name='conn_to', on_delete=models.CASCADE)
+    relation = models.CharField(max_length=100, default='', blank=True)
 
     class Meta:
         unique_together = ('document', 'source', 'to')

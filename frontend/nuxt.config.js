@@ -50,9 +50,7 @@ export default {
   */
   plugins: [
     '~/plugins/filters.js',
-    '~/plugins/vue-shortkey.js',
-    '~/plugins/jsplumb.js',
-    '~/plugins/mixins.js'
+    '~/plugins/vue-shortkey.js'
   ],
   /*
   ** Nuxt.js modules

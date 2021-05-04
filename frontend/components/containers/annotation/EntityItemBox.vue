@@ -73,9 +73,10 @@ export default {
       }
       this.deleteConnection(payload)
     },
-    updateConn(connectionId) {
+    updateConn(connectionId, relation) {
       const payload = {
         connectionId,
+        relation,
         projectId: this.$route.params.id
       }
       this.updateConnection(payload)

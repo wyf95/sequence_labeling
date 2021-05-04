@@ -203,14 +203,13 @@ export const actions = {
   },
 
   addConnection({ commit, state }, payload) {
-    // var conn = state.items[state.current].connections.filter(item => item.source === payload.source && item.to === payload.to)
     const documentId = state.items[state.current].id
     ConnectionService.addConnection(payload.projectId, documentId, payload)
       .then((response) => {
         commit('addConnection', response.data)
       })
       .catch((error) => {
-        // alert(error)
+        alert(error)
       })
   },
   updateConnection({ commit, state }, payload) {
@@ -220,7 +219,7 @@ export const actions = {
         commit('updateConnection', response.data)
       })
       .catch((error) => {
-        // alert(error)
+        alert(error)
       })
   },
   deleteConnection({ commit, state }, payload) {
@@ -230,7 +229,7 @@ export const actions = {
         commit('deleteConnection', payload.connectionId)
       })
       .catch((error) => {
-        // alert(error)
+        alert(error)
       })
   },
 

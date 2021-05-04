@@ -25,7 +25,6 @@
     "papaparse": "^5.2.0",
     "tui-editor": "^1.4.10",
     "vue-chartjs": "^3.5.0",
-    "vue-element-multiple-message": "^1.0.1",
     "vue-shortkey": "^3.1.7",
     "vuetify": "^2.3.4",
     "yarn": "^1.22.4"
