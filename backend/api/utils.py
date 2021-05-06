@@ -254,11 +254,9 @@ class PlainTextParser(FileParser):
         file = io.TextIOWrapper(file, encoding=file.encoding)
         while True:
             batch = list(itertools.islice(file, settings.IMPORT_BATCH_SIZE))
-            
-            while '\n' in batch:
-                batch.remove('\n')
 
-            # splitstr = '\n'
+            # # 取消以下注释，则使用splitstr作为分割符
+            # splitstr = '----'
             # batch = ''.join(batch)
             # if splitstr in batch:
             #     batch = batch.split(splitstr)

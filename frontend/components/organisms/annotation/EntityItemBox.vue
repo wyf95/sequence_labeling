@@ -147,7 +147,7 @@ export default {
       showAll: true, // true-全部显示 false-只显示showId
       clickConn: null,
       showRelations: false,
-      relations: ['', 'attOf', 'valueOf'],
+      relations: ['', 'attrOf', 'valueOf'], // 关系列表
       timer: null
     }
   },
