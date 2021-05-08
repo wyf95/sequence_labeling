@@ -389,7 +389,6 @@ class JSONPainter(object):
                 a.pop('document')
                 a.pop('created_at')
                 a.pop('updated_at')
-            print(d['connections'])
             for a in d['connections']:
                 a.pop('id')
                 a.pop('document')

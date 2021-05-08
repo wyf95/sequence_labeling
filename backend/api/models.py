@@ -127,14 +127,27 @@ class SequenceAnnotation(Annotation):
     class Meta:
         unique_together = ('document', 'user', 'label', 'start_offset', 'end_offset')
 
+class Relation(models.Model):
+    text = models.CharField(max_length=100)
+    project = models.ForeignKey(Project, related_name='relations', on_delete=models.CASCADE)
+    color = models.CharField(max_length=7, default='#209cee')
+
+    def __str__(self):
+        return self.text
+
+    class Meta:
+        unique_together = (
+            ('project', 'text'),
+        )
+
 class Connection(models.Model):
     document = models.ForeignKey(Document, related_name='seq_connections', on_delete=models.CASCADE)
     source = models.ForeignKey(SequenceAnnotation, related_name='conn_source', on_delete=models.CASCADE)
     to = models.ForeignKey(SequenceAnnotation, related_name='conn_to', on_delete=models.CASCADE)
-    relation = models.CharField(max_length=100, default='', blank=True)
+    relation = models.ForeignKey(Relation, on_delete=models.SET_NULL, blank=True, null=True)
 
     class Meta:
-        unique_together = ('document', 'source', 'to')
+        unique_together = ('document', 'relation', 'source', 'to')
 
 
 class Role(models.Model):

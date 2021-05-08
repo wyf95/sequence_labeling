@@ -20,9 +20,9 @@ from rest_framework.parsers import MultiPartParser
 from rest_framework_csv.renderers import CSVRenderer
 
 from .filters import DocumentFilter
-from .models import Project, Label, Document, RoleMapping, Role
+from .models import Project, Label, Document, RoleMapping, Role, Relation
 from .permissions import IsProjectAdmin, IsAnnotatorAndReadOnly, IsAnnotator, IsAnnotationApproverAndReadOnly, IsAnnotationApprover
-from .serializers import ProjectSerializer, LabelSerializer, DocumentSerializer, UserSerializer, ApproverSerializer
+from .serializers import ProjectSerializer, LabelSerializer, DocumentSerializer, UserSerializer, ApproverSerializer, RelationSerializer
 from .serializers import RoleMappingSerializer, RoleSerializer
 from .utils import CSVParser, ExcelParser, JSONParser, PlainTextParser, CoNLLParser, AudioParser, iterable_to_io
 from .utils import JSONLRenderer
@@ -157,6 +157,26 @@ class LabelDetail(generics.RetrieveUpdateDestroyAPIView):
     queryset = Label.objects.all()
     serializer_class = LabelSerializer
     lookup_url_kwarg = 'label_id'
+    permission_classes = [IsAuthenticated & IsInProjectReadOnlyOrAdmin]
+
+class RelationList(generics.ListCreateAPIView):
+    serializer_class = RelationSerializer
+    pagination_class = None
+    permission_classes = [IsAuthenticated & IsInProjectReadOnlyOrAdmin]
+
+    def get_queryset(self):
+        project = get_object_or_404(Project, pk=self.kwargs['project_id'])
+        return project.relations
+
+    def perform_create(self, serializer):
+        project = get_object_or_404(Project, pk=self.kwargs['project_id'])
+        serializer.save(project=project)
+
+
+class RelationDetail(generics.RetrieveUpdateDestroyAPIView):
+    queryset = Relation.objects.all()
+    serializer_class = RelationSerializer
+    lookup_url_kwarg = 'relation_id'
     permission_classes = [IsAuthenticated & IsInProjectReadOnlyOrAdmin]
 
 
@@ -444,6 +464,13 @@ class LabelUploadAPI(APIView):
     parser_classes = (MultiPartParser,)
     permission_classes = [IsAuthenticated & IsProjectAdmin]
 
+    def randomcolor(self):
+        colorArr = ['1','2','3','4','5','6','7','8','9','A','B','C','D','E','F']
+        color = ""
+        for i in range(6):
+            color += colorArr[random.randint(0,14)]
+        return "#"+color
+
     @transaction.atomic
     def post(self, request, *args, **kwargs):
         if 'file' not in request.data:
@@ -452,7 +479,38 @@ class LabelUploadAPI(APIView):
         project = get_object_or_404(Project, pk=kwargs['project_id'])
         try:
             for label in labels:
+                if not 'background_color' in label.keys():
+                    label['background_color'] = self.randomcolor()
                 serializer = LabelSerializer(data=label)
+                serializer.is_valid(raise_exception=True)
+                serializer.save(project=project)
+            return Response(status=status.HTTP_201_CREATED)
+        except IntegrityError:
+            content = {'error': 'IntegrityError: you cannot create a label with same name or shortkey.'}
+            return Response(content, status=status.HTTP_400_BAD_REQUEST)
+
+class RelationUploadAPI(APIView):
+    parser_classes = (MultiPartParser,)
+    permission_classes = [IsAuthenticated & IsProjectAdmin]
+
+    def randomcolor(self):
+        colorArr = ['1','2','3','4','5','6','7','8','9','A','B','C','D','E','F']
+        color = ""
+        for i in range(6):
+            color += colorArr[random.randint(0,14)]
+        return "#"+color
+
+    @transaction.atomic
+    def post(self, request, *args, **kwargs):
+        if 'file' not in request.data:
+            raise ParseError('Empty content')
+        relations = json.load(request.data['file'])
+        project = get_object_or_404(Project, pk=kwargs['project_id'])
+        try:
+            for relation in relations:
+                if not 'color' in relation.keys():
+                    relation['color'] = self.randomcolor()
+                serializer = RelationSerializer(data=relation)
                 serializer.is_valid(raise_exception=True)
                 serializer.save(project=project)
             return Response(status=status.HTTP_201_CREATED)

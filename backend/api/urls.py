@@ -5,6 +5,7 @@ from rest_framework.urlpatterns import format_suffix_patterns
 from .views import Me, Features, Users, Health
 from .views import ProjectList, ProjectDetail
 from .views import LabelList, LabelDetail, ApproveLabelsAPI, LabelUploadAPI
+from .views import RelationList, RelationDetail, RelationUploadAPI
 from .views import DocumentList, DocumentDetail
 from .views import AnnotationList, AnnotationDetail
 from .views import ConnectionList, ConnectionDetail
@@ -30,6 +31,14 @@ urlpatterns = [
          LabelUploadAPI.as_view(), name='label_upload'),
     path('projects/<int:project_id>/labels/<int:label_id>',
          LabelDetail.as_view(), name='label_detail'),
+
+    path('projects/<int:project_id>/relations',
+         RelationList.as_view(), name='relation_list'),
+    path('projects/<int:project_id>/relations/<int:relation_id>',
+         RelationDetail.as_view(), name='relation_detail'),
+    path('projects/<int:project_id>/relation-upload',
+         RelationUploadAPI.as_view(), name='relation_upload'),
+
     path('projects/<int:project_id>/docs',
          DocumentList.as_view(), name='doc_list'),
     path('projects/<int:project_id>/docs/<int:doc_id>',
@@ -40,10 +49,12 @@ urlpatterns = [
          AnnotationList.as_view(), name='annotation_list'),
     path('projects/<int:project_id>/docs/<int:doc_id>/annotations/<int:annotation_id>',
          AnnotationDetail.as_view(), name='annotation_detail'),
+
     path('projects/<int:project_id>/docs/<int:doc_id>/connections',
          ConnectionList.as_view(), name='connection_list'),
     path('projects/<int:project_id>/docs/<int:doc_id>/connections/<int:connection_id>',
          ConnectionDetail.as_view(), name='connection_detail'),
+         
     path('projects/<int:project_id>/docs/upload',
          TextUploadAPI.as_view(), name='doc_uploader'),
     path('projects/<int:project_id>/docs/download',

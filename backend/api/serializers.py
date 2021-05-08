@@ -5,7 +5,7 @@ from rest_framework import serializers
 from rest_framework.exceptions import ValidationError
 
 from .models import Label, Project, Document, RoleMapping, Role
-from .models import SequenceAnnotation, Connection
+from .models import SequenceAnnotation, Connection, Relation
 
 
 class UserSerializer(serializers.ModelSerializer):
@@ -148,6 +148,12 @@ class SequenceAnnotationSerializer(serializers.ModelSerializer):
         model = SequenceAnnotation
         fields = ('id', 'label', 'start_offset', 'end_offset', 'user', 'document', 'created_at', 'updated_at')
         read_only_fields = ('user',)
+
+class RelationSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = Relation
+        fields = ('id', 'text', 'color')
 
 class ConnectionSerializer(serializers.ModelSerializer):
     document = serializers.PrimaryKeyRelatedField(queryset=Document.objects.all())
