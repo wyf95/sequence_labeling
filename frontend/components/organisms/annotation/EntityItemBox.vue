@@ -13,6 +13,7 @@
       @update="updateEntity($event.id, chunk.id)"
       @showConn="clickShow(chunk.id)"
     />
+    
     <v-menu
       v-model="showMenu"
       :position-x="x"
@@ -61,10 +62,10 @@
         <v-list-item
           v-for="(relation, i) in relations"
           :key="i"
-          @click="assignRelation(relation)"
+          @click="assignRelation(relation.id, relation.text, relation.color)"
         >
           <v-list-item-content>
-            <v-list-item-title v-text="relation" />
+            <v-list-item-title v-text="relation.text" />
           </v-list-item-content>
         </v-list-item>
       </v-list>
@@ -89,6 +90,11 @@ export default {
       required: true
     },
     labels: {
+      type: Array,
+      default: () => ([]),
+      required: true
+    },
+    relations: {
       type: Array,
       default: () => ([]),
       required: true
@@ -147,7 +153,6 @@ export default {
       showAll: true, // true-全部显示 false-只显示showId
       clickConn: null,
       showRelations: false,
-      relations: ['', 'attrOf', 'valueOf'], // 关系列表
       timer: null
     }
   },
@@ -234,23 +239,35 @@ export default {
     loadLine() {
       for (var i = 0; i < this.connections.length; i++){
         let node = this.connections[i]
-        var params = {
-          source: String(node.source),
-          target: String(node.to),
-          overlays: [
-            ["Label", {
-              label: node.relation,
-              labelStyle: {
-                padding: "1px 3px",
-                // color: "#565758",
-                fill: "#03A9F4",
-                borderWidth: "1",
-                cssClass: 'flowLabel'
-              }
-            }]
-          ]
+        var exist = this.entities.filter(item => item.id === node.source)
+        if (exist.length === 0) {
+          continue
         }
-        this.jsPlumb.connect(params, this.jsplumbConnectOptions)
+        var relation = this.relations.filter(item => item.id === node.relation)
+        if (relation.length === 0) {
+          var params = {
+            source: String(node.source),
+            target: String(node.to)
+          }
+          this.jsPlumb.connect(params, this.jsplumbConnectOptions)
+        } else {
+          var params = {
+            source: String(node.source),
+            target: String(node.to),
+            overlays: [
+              ["Label", {
+                label: relation[0].text,
+                labelStyle: {
+                  padding: "1px 3px",
+                  fill: relation[0].color,
+                  borderWidth: "1",
+                  cssClass: 'flowLabel'
+                }
+              }]
+            ]
+          }
+          this.jsPlumb.connect(params, this.jsplumbConnectOptions)
+        }
       }
     },
 
@@ -364,13 +381,13 @@ export default {
       }
     },
     // 修改连线关系
-    assignRelation(relation) {
+    assignRelation(id, text, color) {
       var sourceId = this.clickConn.sourceId
       var targetId = this.clickConn.targetId
       // 更新数据
       var conn = this.connections.filter(item => item.source === Number(sourceId) && item.to === Number(targetId))
       if (conn.length > 0) {
-        this.updateConnection(conn[0].id, relation)
+        this.updateConnection(conn[0].id, id)
       }
       this.showRelations = false
 
@@ -380,10 +397,10 @@ export default {
         target: targetId,
         overlays: [
           ["Label", {
-            label: relation,
+            label: text,
             labelStyle: {
               padding: "1px 3px",
-              fill: "#ffb300",
+              fill: color,
               borderWidth: "1",
               cssClass: 'flowLabel'
             }

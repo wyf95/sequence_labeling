@@ -4,7 +4,7 @@ from django.shortcuts import get_object_or_404
 from rest_framework import serializers
 from rest_framework.exceptions import ValidationError
 
-from .models import Label, Project, Document, RoleMapping, Role
+from .models import Label, Project, Document, RoleMapping, Role, User
 from .models import SequenceAnnotation, Connection, Relation
 
 
@@ -65,8 +65,11 @@ class DocumentSerializer(serializers.ModelSerializer):
         project = instance.project
         model = project.get_annotation_class()
         serializer = project.get_annotation_serializer()
-        # if request:
         annotations = model.objects.filter(document=instance.id)
+        
+        if not request.user.is_superuser:
+            annotations = annotations.filter(user=request.user.id)
+
         serializer = serializer(annotations, many=True)
         return serializer.data
     

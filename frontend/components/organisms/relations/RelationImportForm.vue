@@ -1,7 +1,7 @@
 <template>
   <base-card
     :disabled="!valid"
-    :title="$t('labels.importTitle')"
+    :title="$t('relations.importTitle')"
     :agree-text="$t('generic.upload')"
     :cancel-text="$t('generic.cancel')"
     @agree="create"
@@ -20,7 +20,7 @@
         >
           {{ $t('errors.fileCannotUpload') }}
         </v-alert>
-        <h2>{{ $t('labels.importMessage1') }}</h2>
+        <h2>{{ $t('relations.importMessage1') }}</h2>
         <v-sheet
           v-if="exampleFormat"
           :dark="!$vuetify.theme.dark"
@@ -29,12 +29,12 @@
         >
           <pre>{{ exampleFormat }}</pre>
         </v-sheet>
-        <h2>{{ $t('labels.importMessage2') }}</h2>
+        <h2>{{ $t('relations.importMessage2') }}</h2>
         <v-file-input
           v-model="file"
           :rules="uploadFileRules($t('rules.uploadFileRules'))"
           accept=".json"
-          :label="$t('labels.filePlaceholder')"
+          :relation="$t('relations.filePlaceholder')"
         />
       </v-form>
     </template>
@@ -50,7 +50,7 @@ export default {
     BaseCard
   },
   props: {
-    uploadLabel: {
+    uploadRelation: {
       type: Function,
       default: () => {},
       required: true
@@ -70,13 +70,11 @@ export default {
       const data = [
         {
           text: 'Dog(不可重复)',
-          suffix_key: 'a(不可重复)',
-          background_color: '#FF0000(可选)'
+          color: '#FF0000(可选)'
         },
         {
           text: 'Cat(不可重复)',
-          suffix_key: 'c(不可重复)',
-          background_color: '#FF0000(可选)'
+          color: '#FF0000(可选)'
         }
       ]
       return JSON.stringify(data, null, 4)
@@ -95,7 +93,7 @@ export default {
     },
     create() {
       if (this.validate()) {
-        this.uploadLabel({
+        this.uploadRelation({
           projectId: this.$route.params.id,
           file: this.file
         })

@@ -2,6 +2,7 @@
   <entity-item-box
     v-if="isReady"
     :labels="items"
+    :relations="relationItems"
     :text="currentDoc.text"
     :entities="currentDoc.annotations"
     :connections="currentDoc.connections"
@@ -25,6 +26,7 @@ export default {
 
   computed: {
     ...mapState('labels', ['items', 'loading']),
+    ...mapState('relations', ['relationItems', 'loading']),
     ...mapState('documents', { documentLoading: 'loading' }),
     ...mapGetters('documents', ['currentDoc']),
     isReady() {
@@ -35,11 +37,15 @@ export default {
   created() {
     this.getLabelList({
       projectId: this.$route.params.id
+    }),
+    this.getRelationList({
+      projectId: this.$route.params.id
     })
   },
 
   methods: {
     ...mapActions('labels', ['getLabelList']),
+    ...mapActions('relations', ['getRelationList']),
     ...mapActions('documents', ['getDocumentList', 'deleteAnnotation', 'updateAnnotation', 'addAnnotation', 'deleteConnection', 'updateConnection', 'addConnection']),
     removeEntity(annotationId) {
       const payload = {
@@ -73,10 +79,10 @@ export default {
       }
       this.deleteConnection(payload)
     },
-    updateConn(connectionId, relation) {
+    updateConn(connectionId, relationId) {
       const payload = {
         connectionId,
-        relation,
+        relation: relationId,
         projectId: this.$route.params.id
       }
       this.updateConnection(payload)
@@ -85,6 +91,7 @@ export default {
       const payload = {
         source: source,
         to: to,
+        relation: null,
         projectId: this.$route.params.id
       }
       this.addConnection(payload)
@@ -96,9 +103,6 @@ export default {
 <style>
 /* 连线中的label 样式*/
 .jtk-overlay.flowLabel:not(.aLabel) {
-    /* /* padding: 1px 5px; */
-    /* color: #565758 !important; */
-    /* border: 1px solid #E0E3E7;  */
     border-radius: 5px;
 }
 </style>

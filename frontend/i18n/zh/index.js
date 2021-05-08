@@ -11,6 +11,7 @@ import errors from './projects/errors'
 import guideline from './projects/guideline'
 import projectHome from './projects/home'
 import labels from './projects/labels'
+import relations from './projects/relations'
 import members from './projects/members'
 import overview from './projects/overview'
 import statistics from './projects/statistics'
@@ -29,6 +30,7 @@ export default {
   guideline,
   projectHome,
   labels,
+  relations,
   members,
   overview,
   statistics

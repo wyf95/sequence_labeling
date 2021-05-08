@@ -6,6 +6,10 @@ export default {
     labelRequired: '请输入名称',
     labelLessThan30Chars: '名称必须少于30个字符'
   },
+  relationNameRules: {
+    relationRequired: '请输入名称',
+    relationLessThan30Chars: '名称必须少于30个字符'
+  },
   userNameRules: {
     userNameRequired: '请输入用户名',
     userNameLessThan30Chars: '用户名必须少于30个字符'

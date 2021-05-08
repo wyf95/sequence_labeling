@@ -17,7 +17,7 @@ from rest_framework.renderers import JSONRenderer
 from seqeval.metrics.sequence_labeling import get_entities
 
 from .exceptions import FileParseException
-from .models import Label, User
+from .models import Label, User, Relation
 from .serializers import DocumentSerializer, LabelSerializer
 
 
@@ -392,6 +392,10 @@ class JSONPainter(object):
             for a in d['connections']:
                 a.pop('id')
                 a.pop('document')
+                if a['relation']:
+                    a['relation'] = Relation.objects.get(id=a['relation']).text
+                else:  
+                    a.pop('relation')
             data.append(d)
         return data
 

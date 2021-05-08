@@ -12,6 +12,13 @@ export const labelNameRules = (msg) => {
   ]
 }
 
+export const relationNameRules = (msg) => {
+  return [
+    v => !!v || msg.relationRequired,
+    v => (v && v.length <= 30) || msg.relationLessThan30Chars
+  ]
+}
+
 // Rules for project member.
 export const userNameRules = (msg) => {
   return [

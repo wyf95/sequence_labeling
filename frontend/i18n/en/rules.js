@@ -6,6 +6,10 @@ export default {
     labelRequired: 'Label name is required',
     labelLessThan30Chars: 'Label name must be less than 30 characters'
   },
+  relationNameRules: {
+    relationRequired: 'Relation name is required',
+    relationLessThan30Chars: 'Relation name must be less than 30 characters'
+  },
   userNameRules: {
     userNameRequired: 'User name is required',
     userNameLessThan30Chars: 'User name must be less than 30 characters'

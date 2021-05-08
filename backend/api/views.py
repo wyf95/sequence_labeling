@@ -194,7 +194,6 @@ class DocumentList(generics.ListCreateAPIView):
 
         queryset = project.documents
         queryset = queryset.order_by('id')
-
         return queryset
 
     def perform_create(self, serializer):
