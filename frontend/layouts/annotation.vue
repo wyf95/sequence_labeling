@@ -168,8 +168,9 @@ export default {
       this.$fetch()
     },
     filterOption() {
-      this.page = 1
       this.$fetch()
+      // 刷新页面
+      this.$router.go(0)
     },
     current: {
       handler() {

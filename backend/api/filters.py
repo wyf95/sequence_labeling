@@ -13,6 +13,8 @@ class DocumentFilter(FilterSet):
                 Q(**{ f"{field_name}__user": self.request.user})))
 
         should_have_annotations = not value
+        print(should_have_annotations)
+        # 过滤：该用户有无标注
         if should_have_annotations:
             queryset = queryset.filter(num_annotations__gte=1)
         else:

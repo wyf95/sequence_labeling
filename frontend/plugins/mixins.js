@@ -86,13 +86,13 @@ export const easyFlowMixin = {
                 // anchor: 'Continuous',
                 anchor: ['Top'],
                 // 设置连线上面的label样式
-                labelStyle: {
-                    cssClass: 'flowLabel'
-                },
-                // 修改了jsplumb 源码，支持label 为空传入自定义style
-                emptyLabelStyle: {
-                    cssClass: 'emptyFlowLabel'
-                }
+                // labelStyle: {
+                //     cssClass: 'flowLabel'
+                // },
+                // // 修改了jsplumb 源码，支持label 为空传入自定义style
+                // emptyLabelStyle: {
+                //     cssClass: 'emptyFlowLabel'
+                // }
             },
             /**
              * 源点配置参数

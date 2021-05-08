@@ -73,10 +73,10 @@
 </template>
 
 <script>
-import '~/plugins/jsplumb.js'
 import EntityItem from '~/components/molecules/EntityItem'
 import lodash from 'lodash'
 import { easyFlowMixin } from '~/plugins/mixins.js'
+import '~/plugins/jsplumb.js'
 
 export default {
   components: {
@@ -177,7 +177,7 @@ export default {
       }
       // add the rest of text.
       chunks = chunks.concat(this.makeChunks(this.text.slice(startOffset, this.text.length)))
-      
+
       // 加载连线
       this.$nextTick(() => {
         this.loadChart()
@@ -207,12 +207,12 @@ export default {
   mixins: [easyFlowMixin],
 
   methods: {
-    loadChart() {
+    loadChart() {      
       // 删除现有
-      if (this.jsPlumb !== null) {
-        this.jsPlumb.reset()
-      } else {
+      if (this.jsPlumb === null) {
         this.jsPlumb = jsPlumb.getInstance()
+      } else {
+        this.jsPlumb.reset()
       }
       // 初始化jsplumb
       this.$nextTick(() => {
@@ -237,7 +237,18 @@ export default {
         var params = {
           source: String(node.source),
           target: String(node.to),
-          label: node.relation
+          overlays: [
+            ["Label", {
+              label: node.relation,
+              labelStyle: {
+                padding: "1px 3px",
+                // color: "#565758",
+                fill: "#03A9F4",
+                borderWidth: "1",
+                cssClass: 'flowLabel'
+              }
+            }]
+          ]
         }
         this.jsPlumb.connect(params, this.jsplumbConnectOptions)
       }
@@ -247,12 +258,12 @@ export default {
       this.jsPlumb.ready(() => {
         // 导入默认配置
         this.jsPlumb.importDefaults(this.jsplumbSetting)
-        // 会使整个jsPlumb立即重绘。
-        this.jsPlumb.setSuspendDrawing(false, true)
-        // // 初始化节点与连线
+
+        // 初始化节点 连线 和显示
         this.loadNode()
         this.loadLine()
         this.showConnection()
+
         // 连线
         this.jsPlumb.bind("connection", (evt) => {
           let from = evt.source.id
@@ -293,11 +304,14 @@ export default {
       })
     },
 
-    // // 添加连线
+    // 添加连线
     addLine(from, to) {
-      this.addConnection(Number(from), Number(to))
+      var conn = this.connections.filter(item => item.source === Number(from) && item.to === Number(to))
+      if (conn.length == 0) {
+        this.addConnection(Number(from), Number(to))
+      }
     },
-    // // 删除连线
+    // 删除连线
     deleteLine(from, to) {
       var conn = this.connections.filter(item => item.source === Number(from) && item.to === Number(to))
       if (conn.length > 0) {
@@ -349,24 +363,35 @@ export default {
         }
       }
     },
+    // 修改连线关系
     assignRelation(relation) {
-      // 更新显示
-      this.clickConn.setLabel(relation)
-      if (relation === '') {
-        this.clickConn.removeClass('flowLabel')
-        this.clickConn.addClass('emptyFlowLabel')
-      } else {
-        this.clickConn.removeClass('emptyFlowLabel')
-        this.clickConn.addClass('flowLabel')
-      }
+      var sourceId = this.clickConn.sourceId
+      var targetId = this.clickConn.targetId
       // 更新数据
-      var sourceId = Number(this.clickConn.sourceId)
-      var targetId = Number(this.clickConn.targetId)
-      var conn = this.connections.filter(item => item.source === sourceId && item.to === targetId)
+      var conn = this.connections.filter(item => item.source === Number(sourceId) && item.to === Number(targetId))
       if (conn.length > 0) {
         this.updateConnection(conn[0].id, relation)
       }
       this.showRelations = false
+
+      // 重新连接
+      var params = {
+        source: sourceId,
+        target: targetId,
+        overlays: [
+          ["Label", {
+            label: relation,
+            labelStyle: {
+              padding: "1px 3px",
+              fill: "#ffb300",
+              borderWidth: "1",
+              cssClass: 'flowLabel'
+            }
+          }]
+        ]
+      }
+      this.jsPlumb.deleteConnection(this.clickConn)
+      this.jsPlumb.connect(params, this.jsplumbConnectOptions)
     },
 
     makeChunks(text) {

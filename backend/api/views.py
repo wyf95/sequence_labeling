@@ -62,7 +62,10 @@ class ProjectList(generics.ListCreateAPIView):
     permission_classes = [IsAuthenticated & IsInProjectReadOnlyOrAdmin]
 
     def get_queryset(self):
-        return self.request.user.projects
+        if self.request.user.is_superuser:
+            return Project.objects.all()
+        else:
+            return self.request.user.projects
 
     def perform_create(self, serializer):
         serializer.save(users=[self.request.user])
@@ -402,7 +405,9 @@ class Users(APIView):
     permission_classes = [IsAuthenticated & IsProjectAdmin]
 
     def get(self, request, *args, **kwargs):
-        queryset = User.objects.all()
+        # queryset = User.objects.all()
+        # 用于管理项目成员，superuser应可管理所有数据
+        queryset = User.objects.filter(is_superuser=False)
         serialized_data = UserSerializer(queryset, many=True).data
         return Response(serialized_data)
 
