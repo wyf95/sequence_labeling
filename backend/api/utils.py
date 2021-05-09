@@ -394,8 +394,6 @@ class JSONPainter(object):
                 a.pop('document')
                 if a['relation']:
                     a['relation'] = Relation.objects.get(id=a['relation']).text
-                else:  
-                    a.pop('relation')
             data.append(d)
         return data
 

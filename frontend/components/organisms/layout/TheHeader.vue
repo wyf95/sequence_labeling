@@ -3,7 +3,7 @@
     app
     clipped-left
   >
-    <!-- <slot name="leftDrawerIcon" /> -->
+    <slot name="leftDrawerIcon" />
     <nuxt-link
       to="/"
       style="line-height:0;"

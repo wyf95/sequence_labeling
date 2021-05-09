@@ -101,7 +101,7 @@ export default {
 </script>
 
 <style>
-.jtk-connector {
+/* .jtk-connector {
   z-index: 100;
   margin-top: -63px;
   margin-left: -256px;
@@ -113,7 +113,7 @@ export default {
 .jtk-overlay {
   margin-top: -63px;
   margin-left: -256px;
-}
+} */
 /* 连线中的label 样式*/
 .jtk-overlay.flowLabel:not(.aLabel) {
   z-index: 200;

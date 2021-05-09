@@ -1,5 +1,5 @@
 <template>
-<div id="container">
+<v-card id="BoxContainer">
   <v-card v-for="(chunks, index) in chunksList" :key="index" style="margin-bottom:40px">
     <v-card-text class="title">
       <div class="highlight-container highlight-container--bottom-labels" @click="open" @touchend="open">
@@ -77,7 +77,7 @@
       </v-list-item>
     </v-list>
   </v-menu>
-</div>
+</v-card>
   
 </template>
 
@@ -317,7 +317,7 @@ export default {
           }
           return true
         })
-        this.jsPlumb.setContainer("container")
+        this.jsPlumb.setContainer("BoxContainer")
       })
     },
 
