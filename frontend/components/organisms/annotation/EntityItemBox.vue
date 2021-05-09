@@ -1,76 +1,84 @@
 <template>
-  <div class="highlight-container highlight-container--bottom-labels" @click="open" @touchend="open">
-    <entity-item
-      v-for="(chunk, i) in chunks"
-      :key="i"
-      :lid="chunk.id"
-      :content="chunk.text"
-      :newline="chunk.newline"
-      :label="chunk.label"
-      :color="chunk.color"
-      :labels="labels"
-      @remove="removeEntity(chunk.id)"
-      @update="updateEntity($event.id, chunk.id)"
-      @showConn="clickShow(chunk.id)"
-    />
-    
-    <v-menu
-      v-model="showMenu"
-      :position-x="x"
-      :position-y="y"
-      absolute
-      offset-y
-      style=""
-    >
-      <v-list
-        dense
-        min-width="150"
-        max-height="300"
-        class="overflow-y-auto"
-      >
-        <v-list-item
-          v-for="(label, i) in labels"
+<div id="container">
+  <v-card v-for="(chunks, index) in chunksList" :key="index" style="margin-bottom:40px">
+    <v-card-text class="title">
+      <div class="highlight-container highlight-container--bottom-labels" @click="open" @touchend="open">
+        <entity-item
+          v-for="(chunk, i) in chunks"
           :key="i"
-          v-shortkey="[label.suffix_key]"
-          @shortkey="assignLabel(label.id)"
-          @click="assignLabel(label.id)"
-        >
-          <v-list-item-content>
-            <v-list-item-title v-text="label.text" />
-          </v-list-item-content>
-          <v-list-item-action>
-            <v-list-item-action-text v-text="label.suffix_key" />
-          </v-list-item-action>
-        </v-list-item>
-      </v-list>
-    </v-menu>
+          :lid="chunk.id"
+          :content="chunk.text"
+          :newline="chunk.newline"
+          :label="chunk.label"
+          :color="chunk.color"
+          :labels="labels"
+          @remove="removeEntity(chunk.id)"
+          @update="updateEntity($event.id, chunk.id)"
+          @showConn="clickShow(chunk.id)"
+        />
+      </div>
+    </v-card-text>
+  </v-card>
+  
 
-    <v-menu
-      v-model="showRelations"
-      :position-x="x"
-      :position-y="y"
-      absolute
-      offset-y
-      style=""
+  <v-menu
+    v-model="showMenu"
+    :position-x="x"
+    :position-y="y"
+    absolute
+    offset-y
+    style=""
+  >
+    <v-list
+      dense
+      min-width="150"
+      max-height="300"
+      class="overflow-y-auto"
     >
-      <v-list
-        dense
-        min-width="100"
-        max-height="300"
-        class="overflow-y-auto"
+      <v-list-item
+        v-for="(label, i) in labels"
+        :key="i"
+        v-shortkey="[label.suffix_key]"
+        @shortkey="assignLabel(label.id)"
+        @click="assignLabel(label.id)"
       >
-        <v-list-item
-          v-for="(relation, i) in relations"
-          :key="i"
-          @click="assignRelation(relation.id, relation.text, relation.color)"
-        >
-          <v-list-item-content>
-            <v-list-item-title v-text="relation.text" />
-          </v-list-item-content>
-        </v-list-item>
-      </v-list>
-    </v-menu>
-  </div>
+        <v-list-item-content>
+          <v-list-item-title v-text="label.text" />
+        </v-list-item-content>
+        <v-list-item-action>
+          <v-list-item-action-text v-text="label.suffix_key" />
+        </v-list-item-action>
+      </v-list-item>
+    </v-list>
+  </v-menu>
+
+  <v-menu
+    v-model="showRelations"
+    :position-x="x"
+    :position-y="y"
+    absolute
+    offset-y
+    style=""
+  >
+    <v-list
+      dense
+      min-width="100"
+      max-height="300"
+      class="overflow-y-auto"
+    >
+      <v-list-item
+        v-for="(relation, i) in relations"
+        :key="i"
+        @click="assignRelation(relation.id, relation.text, relation.color)"
+      >
+        <v-list-item-content>
+          <v-list-item-title v-text="relation.text" />
+        </v-list-item-content>
+      </v-list-item>
+    </v-list>
+  </v-menu>
+</div>
+  
 </template>
 
 <script>
@@ -162,33 +170,24 @@ export default {
       return this.entities.slice().sort((a, b) => a.start_offset - b.start_offset)
     },
 
-    chunks() {
-      let chunks = []
-      const entities = this.sortedEntities
-      let startOffset = 0
-      for (const entity of entities) {
-        // add non-entities to chunks.
-        chunks = chunks.concat(this.makeChunks(this.text.slice(startOffset, entity.start_offset)))
-        startOffset = entity.end_offset
-
-        // add entities to chunks.
-        const label = this.labelObject[entity.label]
-        chunks.push({
-          id: entity.id,
-          label: label.text,
-          color: label.background_color,
-          text: this.text.slice(entity.start_offset, entity.end_offset)
-        })
+    chunksList() {
+      let chunksList = []
+      this.users = []
+      if (this.sortedEntities.length === 0) {
+        chunksList.push(this.makeChunks(this.text.slice(0, this.text.length)))
+      } else{
+        const entitiesList = lodash.groupBy(this.sortedEntities, 'user')
+        for (const key in entitiesList) {
+          if (Object.hasOwnProperty.call(entitiesList, key)) {
+            const entities = entitiesList[key];
+            chunksList.push(this.getChunks(entities))
+          }
+        }
       }
-      // add the rest of text.
-      chunks = chunks.concat(this.makeChunks(this.text.slice(startOffset, this.text.length)))
-
-      // 加载连线
       this.$nextTick(() => {
         this.loadChart()
       })
-
-      return chunks
+      return chunksList
     },
 
     labelObject() {
@@ -318,6 +317,7 @@ export default {
           }
           return true
         })
+        this.jsPlumb.setContainer("container")
       })
     },
 
@@ -380,6 +380,7 @@ export default {
         }
       }
     },
+
     // 修改连线关系
     assignRelation(id, text, color) {
       var sourceId = this.clickConn.sourceId
@@ -409,6 +410,27 @@ export default {
       }
       this.jsPlumb.deleteConnection(this.clickConn)
       this.jsPlumb.connect(params, this.jsplumbConnectOptions)
+    },
+
+    getChunks(entities) {
+      let startOffset = 0
+      let chunks = []
+      for (const entity of entities) {
+        // add non-entities to chunks.
+        chunks = chunks.concat(this.makeChunks(this.text.slice(startOffset, entity.start_offset)))
+        startOffset = entity.end_offset
+        // add entities to chunks.
+        const label = this.labelObject[entity.label]
+        chunks.push({
+          id: entity.id,
+          label: label.text,
+          color: label.background_color,
+          text: this.text.slice(entity.start_offset, entity.end_offset)
+        })
+      }
+      // add the rest of text.
+      chunks = chunks.concat(this.makeChunks(this.text.slice(startOffset, this.text.length)))
+      return chunks
     },
 
     makeChunks(text) {
@@ -453,6 +475,7 @@ export default {
       } else if (document.selection) {
         selection = document.selection
       }
+
       // If nothing is selected.
       if (selection.rangeCount <= 0) {
         return
@@ -463,7 +486,11 @@ export default {
       preSelectionRange.setEnd(range.startContainer, range.startOffset)
       this.start = [...preSelectionRange.toString()].length
       this.end = this.start + [...range.toString()].length
+
+      this.start = this.start % this.text.length
+      this.end = this.end % this.text.length
     },
+    
     validateSpan() {
       if ((typeof this.start === 'undefined') || (typeof this.end === 'undefined')) {
         return false

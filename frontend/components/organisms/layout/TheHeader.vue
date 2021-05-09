@@ -3,7 +3,7 @@
     app
     clipped-left
   >
-    <slot name="leftDrawerIcon" />
+    <!-- <slot name="leftDrawerIcon" /> -->
     <nuxt-link
       to="/"
       style="line-height:0;"
@@ -13,7 +13,7 @@
     <v-toolbar-title
       class="ml-2 d-none d-sm-flex"
     >
-      Label
+      sequence labeling
     </v-toolbar-title>
     <v-btn
       v-if="isAuthenticated && isIndividualProject"

@@ -1,9 +1,5 @@
 <template>
-  <v-card>
-    <v-card-text class="title">
-      <entity-item-box />
-    </v-card-text>
-  </v-card>
+  <entity-item-box />
 </template>
 
 <script>
@@ -21,3 +17,9 @@ export default {
   }
 }
 </script>
+
+<style>
+.v-navigation-drawer{
+  z-index: 300;
+}
+</style>

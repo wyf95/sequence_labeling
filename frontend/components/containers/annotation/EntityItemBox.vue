@@ -101,8 +101,22 @@ export default {
 </script>
 
 <style>
+.jtk-connector {
+  z-index: 100;
+  margin-top: -63px;
+  margin-left: -256px;
+}
+.jtk-endpoint {
+  margin-top: -63px;
+  margin-left: -256px;
+}
+.jtk-overlay {
+  margin-top: -63px;
+  margin-left: -256px;
+}
 /* 连线中的label 样式*/
 .jtk-overlay.flowLabel:not(.aLabel) {
-    border-radius: 5px;
+  z-index: 200;
+  border-radius: 5px;
 }
 </style>
