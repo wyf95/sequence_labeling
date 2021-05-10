@@ -2,7 +2,7 @@ from django.urls import path
 from rest_framework.authtoken.views import obtain_auth_token
 from rest_framework.urlpatterns import format_suffix_patterns
 
-from .views import Me, Features, Users, Health
+from .views import Me, Users, Health
 from .views import ProjectList, ProjectDetail
 from .views import LabelList, LabelDetail, ApproveLabelsAPI, LabelUploadAPI
 from .views import RelationList, RelationDetail, RelationUploadAPI
@@ -17,7 +17,6 @@ urlpatterns = [
     path('health', Health.as_view(), name='health'),
     path('auth-token', obtain_auth_token),
     path('me', Me.as_view(), name='me'),
-    path('features', Features.as_view(), name='features'),
     path('projects', ProjectList.as_view(), name='project_list'),
     path('users', Users.as_view(), name='user_list'),
     path('roles', Roles.as_view(), name='roles'),

@@ -47,15 +47,6 @@ class Me(APIView):
         return Response(serializer.data)
 
 
-class Features(APIView):
-    permission_classes = (IsAuthenticated,)
-
-    def get(self, request, *args, **kwargs):
-        return Response({
-            'cloud_upload': bool(settings.CLOUD_BROWSER_APACHE_LIBCLOUD_PROVIDER),
-        })
-
-
 class ProjectList(generics.ListCreateAPIView):
     serializer_class = ProjectSerializer
     pagination_class = None
