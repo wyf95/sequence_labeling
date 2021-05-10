@@ -61,12 +61,12 @@ class DocumentSerializer(serializers.ModelSerializer):
     annotation_approver = serializers.SerializerMethodField()
 
     def get_annotations(self, instance):
-        request = self.context.get('request')
         project = instance.project
         model = project.get_annotation_class()
         serializer = project.get_annotation_serializer()
         annotations = model.objects.filter(document=instance.id)
         
+        request = self.context.get('request')
         if request:
             if not request.user.is_superuser:
                 annotations = annotations.filter(user=request.user.id)
@@ -75,7 +75,6 @@ class DocumentSerializer(serializers.ModelSerializer):
         return serializer.data
     
     def get_connections(self, instance):
-        request = self.context.get('request')
         project = instance.project
         model = project.get_connection_class()
         serializer = project.get_connection_serializer()
@@ -90,7 +89,7 @@ class DocumentSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Document
-        fields = ('id', 'text', 'annotations', 'connections', 'meta', 'annotation_approver')
+        fields = ('id', 'text', 'annotations', 'connections', 'annotation_approver')
 
 
 class ApproverSerializer(DocumentSerializer):
@@ -147,10 +146,15 @@ class ProjectFilteredPrimaryKeyRelatedField(serializers.PrimaryKeyRelatedField):
 class SequenceAnnotationSerializer(serializers.ModelSerializer):
     label = serializers.PrimaryKeyRelatedField(queryset=Label.objects.all())
     document = serializers.PrimaryKeyRelatedField(queryset=Document.objects.all())
+    username = serializers.SerializerMethodField()
+
+    def get_username(cls, instance):
+        user = instance.user
+        return user.username if user else None
 
     class Meta:
         model = SequenceAnnotation
-        fields = ('id', 'label', 'start_offset', 'end_offset', 'user', 'document', 'created_at', 'updated_at')
+        fields = ('id', 'label', 'start_offset', 'end_offset', 'user', 'username', 'document', 'created_at', 'updated_at')
         read_only_fields = ('user',)
 
 class RelationSerializer(serializers.ModelSerializer):

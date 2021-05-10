@@ -382,10 +382,9 @@ class JSONPainter(object):
         serializer = DocumentSerializer(documents, many=True)
         data = []
         for d in serializer.data:
-            d.pop('meta')
             for a in d['annotations']:
                 a['label'] = Label.objects.get(id=a['label']).text   
-                a['user'] = User.objects.get(id=a['user']).username
+                a.pop('user')
                 a.pop('document')
                 a.pop('created_at')
                 a.pop('updated_at')

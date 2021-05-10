@@ -9,7 +9,7 @@ from .views import RelationList, RelationDetail, RelationUploadAPI
 from .views import DocumentList, DocumentDetail
 from .views import AnnotationList, AnnotationDetail
 from .views import ConnectionList, ConnectionDetail
-from .views import TextUploadAPI, TextDownloadAPI, CloudUploadAPI
+from .views import TextUploadAPI, TextDownloadAPI
 from .views import StatisticsAPI
 from .views import RoleMappingList, RoleMappingDetail, Roles
 
@@ -18,7 +18,6 @@ urlpatterns = [
     path('auth-token', obtain_auth_token),
     path('me', Me.as_view(), name='me'),
     path('features', Features.as_view(), name='features'),
-    path('cloud-upload', CloudUploadAPI.as_view(), name='cloud_uploader'),
     path('projects', ProjectList.as_view(), name='project_list'),
     path('users', Users.as_view(), name='user_list'),
     path('roles', Roles.as_view(), name='roles'),

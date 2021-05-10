@@ -1,11 +1,11 @@
 <template>
 <v-card id="BoxContainer">
-  <v-card v-for="(chunks, index) in chunksList" :key="index" style="margin-bottom:40px">
+  <v-card v-for="(chunks, index) in chunksList" :key="'card_'+index" style="margin-bottom:50px">
     <v-card-text class="title">
       <div class="highlight-container highlight-container--bottom-labels" @click="open" @touchend="open">
         <entity-item
           v-for="(chunk, i) in chunks"
-          :key="i"
+          :key="'item_'+i"
           :lid="chunk.id"
           :content="chunk.text"
           :newline="chunk.newline"
@@ -18,8 +18,8 @@
         />
       </div>
     </v-card-text>
+    <span v-text="users[index].name" style="float:right; margin-right:30px;"></span>
   </v-card>
-  
 
   <v-menu
     v-model="showMenu"
@@ -161,7 +161,10 @@ export default {
       showAll: true, // true-全部显示 false-只显示showId
       clickConn: null,
       showRelations: false,
-      timer: null
+      timer: null,
+      users: [],
+      choseUser: 0,
+      entitiesList: []
     }
   },
 
@@ -173,14 +176,50 @@ export default {
     chunksList() {
       let chunksList = []
       this.users = []
-      if (this.sortedEntities.length === 0) {
+      // 当前用户名
+      var currentUser = document.getElementById('current_user').innerText
+      
+      if (this.sortedEntities.length === 0) { 
+        // 无实体
         chunksList.push(this.makeChunks(this.text.slice(0, this.text.length)))
-      } else{
-        const entitiesList = lodash.groupBy(this.sortedEntities, 'user')
-        for (const key in entitiesList) {
-          if (Object.hasOwnProperty.call(entitiesList, key)) {
-            const entities = entitiesList[key];
-            chunksList.push(this.getChunks(entities))
+        this.users.push({name: currentUser, id: null, offset: 0})
+      } else {
+        this.entitiesList = lodash.groupBy(this.sortedEntities, 'username')
+        // 只有一组实体，且为当前用户
+        if (Object.keys(this.entitiesList).length === 1 && Object.hasOwnProperty.call(this.entitiesList, currentUser)) {
+          const entities = this.entitiesList[currentUser];
+          chunksList.push(this.getChunks(entities))
+          this.users.push({name: currentUser, id: null, offset: 0})
+        } else {
+          // 多组实体
+          // 无当前用户
+          if (!Object.hasOwnProperty.call(this.entitiesList, currentUser)) {
+            var off = 0
+            chunksList.push(this.makeChunks(this.text.slice(0, this.text.length)))
+            this.users.push({name: currentUser, id: null, offset: off})
+            off = off + currentUser.length + 1
+            for (const key in this.entitiesList) {
+              if (Object.hasOwnProperty.call(this.entitiesList, key)) {
+                const entities = this.entitiesList[key];
+                chunksList.push(this.getChunks(entities))
+                this.users.push({name: key, id: entities[0].user, offset: off})
+                off = off + key.length + 1
+              }
+            }
+          } else {
+            // 有当前用户
+            var off = 0
+            chunksList.push(this.getChunks(this.entitiesList[currentUser]))
+            this.users.push({name: currentUser, id: null, offset: off})
+            off = off + currentUser.length + 1
+            for (const key in this.entitiesList) {
+              if (Object.hasOwnProperty.call(this.entitiesList, key) && key !== currentUser) {
+                const entities = this.entitiesList[key];
+                chunksList.push(this.getChunks(entities))
+                this.users.push({name: key, id: entities[0].user, offset: off})
+                off = off + key.length + 1
+              }
+            }
           }
         }
       }
@@ -276,8 +315,10 @@ export default {
         this.jsPlumb.importDefaults(this.jsplumbSetting)
 
         // 初始化节点 连线 和显示
-        this.loadNode()
-        this.loadLine()
+        this.$nextTick(() => {
+          this.loadNode()
+          this.loadLine()
+        })
         this.showConnection()
 
         // 连线
@@ -486,9 +527,12 @@ export default {
       preSelectionRange.setEnd(range.startContainer, range.startOffset)
       this.start = [...preSelectionRange.toString()].length
       this.end = this.start + [...range.toString()].length
+      
+      // 选中第i栏，对应users[i]
+      this.choseUser = parseInt(this.start / this.text.length)
 
-      this.start = this.start % this.text.length
-      this.end = this.end % this.text.length
+      this.start = this.start % this.text.length - this.users[this.choseUser].offset
+      this.end = this.end % this.text.length - this.users[this.choseUser].offset
     },
     
     validateSpan() {
@@ -498,7 +542,7 @@ export default {
       if (this.start === this.end) {
         return false
       }
-      for (const entity of this.entities) {
+      for (const entity of this.entitiesList[this.users[this.choseUser].name]) {
         if ((entity.start_offset <= this.start) && (this.start < entity.end_offset)) {
           return false
         }
@@ -519,7 +563,7 @@ export default {
     },
     assignLabel(labelId) {
       if (this.validateSpan()) {
-        this.addEntity(this.start, this.end, labelId)
+        this.addEntity(this.start, this.end, labelId, this.users[this.choseUser].id)
         this.showMenu = false
         this.start = 0
         this.end = 0

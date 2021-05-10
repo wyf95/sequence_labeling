@@ -62,11 +62,12 @@ export default {
       }
       this.updateAnnotation(payload)
     },
-    addEntity(startOffset, endOffset, labelId) {
+    addEntity(startOffset, endOffset, labelId, userId) {
       const payload = {
         start_offset: startOffset,
         end_offset: endOffset,
         label: labelId,
+        userId: userId,
         projectId: this.$route.params.id
       }
       this.addAnnotation(payload)
@@ -101,22 +102,8 @@ export default {
 </script>
 
 <style>
-/* .jtk-connector {
-  z-index: 100;
-  margin-top: -63px;
-  margin-left: -256px;
-}
-.jtk-endpoint {
-  margin-top: -63px;
-  margin-left: -256px;
-}
-.jtk-overlay {
-  margin-top: -63px;
-  margin-left: -256px;
-} */
 /* 连线中的label 样式*/
 .jtk-overlay.flowLabel:not(.aLabel) {
-  z-index: 200;
   border-radius: 5px;
 }
 </style>

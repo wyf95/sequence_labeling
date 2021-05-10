@@ -189,34 +189,6 @@ def add_linked_project(sender, instance, created, **kwargs):
         user.projects.add(project)
         user.save()
 
-
-@receiver(post_save)
-def add_superusers_to_project(sender, instance, created, **kwargs):
-    if not created:
-        return
-    if sender not in Project.__subclasses__():
-        return
-    superusers = User.objects.filter(is_superuser=True)
-    admin_role = Role.objects.filter(name=settings.ROLE_PROJECT_ADMIN).first()
-    if superusers and admin_role:
-        RoleMapping.objects.bulk_create(
-            [RoleMapping(role_id=admin_role.id, user_id=superuser.id, project_id=instance.id)
-             for superuser in superusers]
-        )
-
-
-@receiver(post_save, sender=User)
-def add_new_superuser_to_projects(sender, instance, created, **kwargs):
-    if created and instance.is_superuser:
-        admin_role = Role.objects.filter(name=settings.ROLE_PROJECT_ADMIN).first()
-        projects = Project.objects.all()
-        if admin_role and projects:
-            RoleMapping.objects.bulk_create(
-                [RoleMapping(role_id=admin_role.id, user_id=instance.id, project_id=project.id)
-                 for project in projects]
-            )
-
-
 @receiver(pre_delete, sender=RoleMapping)
 def delete_linked_project(sender, instance, using, **kwargs):
     userInstance = instance.user
@@ -226,3 +198,30 @@ def delete_linked_project(sender, instance, using, **kwargs):
         project = Project.objects.get(pk=projectInstance.pk)
         user.projects.remove(project)
         user.save()
+
+
+# @receiver(post_save)
+# def add_superusers_to_project(sender, instance, created, **kwargs):
+#     if not created:
+#         return
+#     if sender not in Project.__subclasses__():
+#         return
+#     superusers = User.objects.filter(is_superuser=True)
+#     admin_role = Role.objects.filter(name=settings.ROLE_PROJECT_ADMIN).first()
+#     if superusers and admin_role:
+#         RoleMapping.objects.bulk_create(
+#             [RoleMapping(role_id=admin_role.id, user_id=superuser.id, project_id=instance.id)
+#              for superuser in superusers]
+#         )
+
+
+# @receiver(post_save, sender=User)
+# def add_new_superuser_to_projects(sender, instance, created, **kwargs):
+#     if created and instance.is_superuser:
+#         admin_role = Role.objects.filter(name=settings.ROLE_PROJECT_ADMIN).first()
+#         projects = Project.objects.all()
+#         if admin_role and projects:
+#             RoleMapping.objects.bulk_create(
+#                 [RoleMapping(role_id=admin_role.id, user_id=instance.id, project_id=project.id)
+#                  for project in projects]
+#             )

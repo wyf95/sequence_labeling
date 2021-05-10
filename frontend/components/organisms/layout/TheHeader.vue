@@ -42,6 +42,7 @@
     >
       {{ $t('user.login') }}
     </v-btn>
+    <v-subheader v-if="isAuthenticated" id='current_user'>{{ getUsername() }}</v-subheader>
     <v-menu
       v-if="isAuthenticated"
       offset-y
@@ -52,7 +53,7 @@
         </v-btn>
       </template>
       <v-list>
-        <v-subheader>{{ getUsername() }}</v-subheader>
+        <!-- <v-subheader id='current_user'>{{ getUsername() }}</v-subheader> -->
         <v-list-item @click="signout">
           <v-list-item-icon>
             <v-icon>mdi-logout</v-icon>
