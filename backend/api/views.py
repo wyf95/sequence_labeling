@@ -307,16 +307,17 @@ class TextUploadAPI(APIView):
             user=request.user,
             file=request.data['file'],
             file_format=request.data['format'],
+            spliter=request.data['spliter'],
             project_id=kwargs['project_id'],
         )
 
         return Response(status=status.HTTP_201_CREATED)
 
     @classmethod
-    def save_file(cls, user, file, file_format, project_id):
+    def save_file(cls, user, file, file_format, spliter, project_id):
         project = get_object_or_404(Project, pk=project_id)
         parser = cls.select_parser(file_format)
-        data = parser.parse(file)
+        data = parser.parse(file, spliter)
         storage = project.get_storage(data)
         storage.save(user)
 

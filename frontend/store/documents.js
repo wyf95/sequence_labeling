@@ -119,6 +119,7 @@ export const actions = {
     const formData = new FormData()
     formData.append('file', data.file)
     formData.append('format', data.format)
+    formData.append('spliter', data.spliter)
     const config = {
       headers: {
         'Content-Type': 'multipart/form-data'

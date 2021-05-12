@@ -43,6 +43,13 @@
           </span>
         </v-sheet>
         <h2>{{ $t('dataset.importDataMessage2') }}</h2>
+        <div v-if="selectedFormat">
+          <v-text-field 
+            v-if="selectedFormat.type=='plain'"
+            v-model="spliter"
+            :label="$t('labels.spliterPlaceholder')"
+          />
+        </div>
         <v-file-input
           v-model="file"
           :accept="acceptType"
@@ -78,6 +85,7 @@ export default {
     return {
       valid: false,
       file: null,
+      spliter: '',
       selectedFormat: null,
       fileFormatRules,
       uploadFileRules,
@@ -90,7 +98,7 @@ export default {
       if (this.selectedFormat) {
         return this.selectedFormat.accept
       } else {
-        return '.txt,.csv,.json,.jsonl'
+        return '.txt,.json,.jsonl'
       }
     }
   },
@@ -110,7 +118,8 @@ export default {
         this.uploadDocument({
           projectId: this.$route.params.id,
           format: this.selectedFormat.type,
-          file: this.file
+          file: this.file,
+          spliter: this.spliter
         })
           .then((response) => {
             this.reset()

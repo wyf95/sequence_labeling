@@ -162,7 +162,7 @@ class SequenceLabelingStorage(BaseStorage):
 
 class FileParser(object):
 
-    def parse(self, file):
+    def parse(self, file, spliter):
         raise NotImplementedError()
 
     @staticmethod
@@ -192,7 +192,7 @@ class CoNLLParser(FileParser):
     ...
     ```
     """
-    def parse(self, file):
+    def parse(self, file, spliter):
         data = []
         file = EncodedIO(file)
         file = io.TextIOWrapper(file, encoding=file.encoding)
@@ -249,20 +249,28 @@ class PlainTextParser(FileParser):
     ...
     ```
     """
-    def parse(self, file):
+    def parse(self, file, spliter):
         file = EncodedIO(file)
         file = io.TextIOWrapper(file, encoding=file.encoding)
         while True:
             batch = list(itertools.islice(file, settings.IMPORT_BATCH_SIZE))
-
-            # # 取消以下注释，则使用splitstr作为分割符
-            # splitstr = '----'
-            # batch = ''.join(batch)
-            # if splitstr in batch:
-            #     batch = batch.split(splitstr)
-
+            print('spliter: ' + spliter)
+            if spliter and spliter != '' and batch:
+                batch_str = ''.join(batch)
+                # print(batch_str)
+                if spliter in batch_str:
+                    batch = batch_str.split(spliter)
+                    while '' in batch:
+                        batch.remove('')
+                    while '\n' in batch:
+                        batch.remove('\n')
+                else:
+                    batch = []
+                    batch.append(batch_str)
+            print(batch)
             if not batch:
                 break
+
             yield [{'text': line.strip('')} for line in batch]
 
 
@@ -280,7 +288,7 @@ class CSVParser(FileParser):
     ...
     ```
     """
-    def parse(self, file):
+    def parse(self, file, spliter):
         file = EncodedIO(file)
         file = io.TextIOWrapper(file, encoding=file.encoding)
         reader = csv.reader(file)
@@ -288,7 +296,7 @@ class CSVParser(FileParser):
 
 
 class ExcelParser(FileParser):
-    def parse(self, file):
+    def parse(self, file, spliter):
         excel_book = pyexcel.iget_book(file_type="xlsx", file_content=file.read())
         # Handle multiple sheets
         for sheet_name in excel_book.sheet_names():
@@ -326,7 +334,7 @@ class ExcelParser(FileParser):
 
 class JSONParser(FileParser):
 
-    def parse(self, file):
+    def parse(self, file, spliter):
         file = EncodedIO(file)
         file = io.TextIOWrapper(file, encoding=file.encoding)
         data = []
@@ -345,7 +353,7 @@ class JSONParser(FileParser):
 
 
 class AudioParser(FileParser):
-    def parse(self, file):
+    def parse(self, file, spliter):
         file_type, _ = mimetypes.guess_type(file.name, strict=False)
         if not file_type:
             raise FileParseException(line_num=1, line='Unable to guess file type')

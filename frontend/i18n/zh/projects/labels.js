@@ -13,5 +13,6 @@ export default {
   importTitle: '导入标签',
   importMessage1: '样例格式',
   importMessage2: '请选择一个文件',
-  filePlaceholder: '输入文件'
+  filePlaceholder: '输入文件',
+  spliterPlaceholder: '输入分割符(不输入则使用按行分割，不允许空行)'
 }

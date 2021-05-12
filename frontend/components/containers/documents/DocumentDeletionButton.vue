@@ -13,7 +13,6 @@
       width="800"
     >
       <confirm-form
-        :items="selected"
         :title="$t('dataset.deleteDocumentsTitle')"
         :message="$t('dataset.deleteDocumentsMessage')"
         :button-true-text="$t('generic.yes')"
