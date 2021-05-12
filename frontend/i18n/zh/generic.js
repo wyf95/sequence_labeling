@@ -15,6 +15,8 @@ export default {
   import: '导入',
   export: '导出',
   description: '描述',
+  entity_concordance: '实体一致性',
+  relation_concordance: '关系一致性',
   type: '类型',
   loading: '加载中... 请等待'
 }

@@ -1,8 +1,10 @@
 import string
+import numpy as np
 
 from django.db import models
 from django.dispatch import receiver
-from django.db.models.signals import post_save, pre_delete
+from django.db.models import Count
+from django.db.models.signals import post_save, pre_delete, post_delete
 from django.urls import reverse
 from django.conf import settings
 from django.contrib.auth.models import User
@@ -18,6 +20,8 @@ class Project(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     users = models.ManyToManyField(User, related_name='projects')
+    entity_concordance = models.DecimalField(default=1.00, max_digits=6, decimal_places=4)
+    relation_concordance = models.DecimalField(default=1.00, max_digits=6, decimal_places=4)
 
     def get_absolute_url(self):
         return reverse('upload', args=[self.id])
@@ -100,6 +104,8 @@ class Document(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     annotations_approved_by = models.ForeignKey(User, on_delete=models.SET_NULL, null=True)
+    entity_concordance = models.DecimalField(default=1.00, max_digits=6, decimal_places=4)
+    relation_concordance = models.DecimalField(default=1.00, max_digits=6, decimal_places=4)
 
     def __str__(self):
         return self.text[:50]
@@ -177,6 +183,123 @@ class RoleMapping(models.Model):
         unique_together = ("user", "project", "role")
 
 
+
+def fleiss(table, n):
+    table = 1.0 * np.asarray(table) 
+    n_sub, _ = table.shape
+
+    if table.sum() != n * n_sub:
+        n_add = n - table.sum(1)
+        table = np.insert(table, 0, values=n_add, axis=1)
+  
+    p_j = table.sum(0) / (n_sub * n)
+    table2 = table * table
+    p_i = (table2.sum(1) - n) / (n * (n - 1.))
+
+    p_o = p_i.mean()
+    p_e = (p_j*p_j).sum()
+    if p_e == 1.:
+        return 1.
+    kappa = (p_o - p_e) / (1 - p_e)
+    return kappa
+
+def comput_annotation_concordance(instance):
+    documentInstance = instance.document
+    if not documentInstance:
+        return
+    document = Document.objects.get(pk=documentInstance.pk)
+    annotations = SequenceAnnotation.objects.filter(document=document.id)
+    users = annotations.values('user').annotate(count=Count('user'))
+    # 无标签或只有一个用户
+    if len(users) < 2:
+        document.entity_concordance = 1
+        document.save()
+        return
+
+    labels = annotations.values('label').annotate(count=Count('label'))
+
+    annotation_json = {}
+    for a in annotations:
+        key = str(a.start_offset) + '_' + str(a.end_offset)
+        if not key in annotation_json.keys():
+            annotation_json[key] = {k['label']:0 for k in labels}
+        annotation_json[key][a.label.id] = annotation_json[key][a.label.id] + 1
+    annotation_list = [[j for i, j in v.items()] for k, v in annotation_json.items()]
+    f = fleiss(annotation_list, len(users))
+    document.entity_concordance = f
+    document.save()
+
+    project = document.project
+    documents = Document.objects.filter(project=project.id)
+    documents_entity_concordance = np.array([k.entity_concordance for k in documents])
+    project.entity_concordance = documents_entity_concordance.mean()
+    project.save()
+
+def comput_relation_concordance(instance):
+    documentInstance = instance.document
+    if not documentInstance:
+        return
+    document = Document.objects.get(pk=documentInstance.pk)
+    connections = Connection.objects.filter(document=document.id)
+    
+    connection_list = []
+    users = []
+    labels = []
+    for c in connections:
+        temp = {}
+        source = c.source
+        end = c.to
+        temp['path'] = str(source.start_offset) + '_' + str(source.end_offset) + '__' + str(end.start_offset) + '_' + str(end.end_offset)
+        temp['user'] = source.user.id
+        if c.relation:
+            temp['label'] = c.relation.id
+        else:
+            temp['label'] = 0
+        if temp['user'] not in users:
+            users.append(temp['user'])
+        if temp['label'] not in labels:
+            labels.append(temp['label'])
+        connection_list.append(temp)
+    
+    if len(users) < 2:
+        document.relation_concordance = 1
+        document.save()
+        return
+
+    connection_json = {}
+    for c in connection_list:
+        key = c['path']
+        if not key in connection_json.keys():
+            connection_json[key] = {k:0 for k in labels}
+        connection_json[key][c['label']] = connection_json[key][c['label']] + 1
+    connection_list2 = [[j for i, j in v.items()] for k, v in connection_json.items()]
+    f = fleiss(connection_list2, len(users))
+    document.relation_concordance = f
+    document.save()
+
+    project = document.project
+    documents = Document.objects.filter(project=project.id)
+    documents_relation_concordance = np.array([k.relation_concordance for k in documents])
+    project.relation_concordance = documents_relation_concordance.mean()
+    project.save()
+
+@receiver(post_save, sender=SequenceAnnotation)
+def save_annotation_comput_concordance(sender, instance, created, **kwargs):
+    comput_annotation_concordance(instance)
+        
+@receiver(post_delete, sender=SequenceAnnotation)
+def delete_annotation_comput_concordance(sender, instance, using, **kwargs):
+    comput_annotation_concordance(instance)
+
+@receiver(post_save, sender=Connection)
+def save_connection_comput_concordance(sender, instance, created, **kwargs):
+    comput_relation_concordance(instance)
+        
+@receiver(post_delete, sender=Connection)
+def delete_connection_comput_concordance(sender, instance, using, **kwargs):
+    comput_relation_concordance(instance)
+
+
 @receiver(post_save, sender=RoleMapping)
 def add_linked_project(sender, instance, created, **kwargs):
     if not created:
@@ -198,30 +321,3 @@ def delete_linked_project(sender, instance, using, **kwargs):
         project = Project.objects.get(pk=projectInstance.pk)
         user.projects.remove(project)
         user.save()
-
-
-# @receiver(post_save)
-# def add_superusers_to_project(sender, instance, created, **kwargs):
-#     if not created:
-#         return
-#     if sender not in Project.__subclasses__():
-#         return
-#     superusers = User.objects.filter(is_superuser=True)
-#     admin_role = Role.objects.filter(name=settings.ROLE_PROJECT_ADMIN).first()
-#     if superusers and admin_role:
-#         RoleMapping.objects.bulk_create(
-#             [RoleMapping(role_id=admin_role.id, user_id=superuser.id, project_id=instance.id)
-#              for superuser in superusers]
-#         )
-
-
-# @receiver(post_save, sender=User)
-# def add_new_superuser_to_projects(sender, instance, created, **kwargs):
-#     if created and instance.is_superuser:
-#         admin_role = Role.objects.filter(name=settings.ROLE_PROJECT_ADMIN).first()
-#         projects = Project.objects.all()
-#         if admin_role and projects:
-#             RoleMapping.objects.bulk_create(
-#                 [RoleMapping(role_id=admin_role.id, user_id=instance.id, project_id=project.id)
-#                  for project in projects]
-#             )

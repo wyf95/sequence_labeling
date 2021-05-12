@@ -5,6 +5,8 @@ export default {
   exportDataset: 'Export Dataset',
   text: 'Text',
   metadata: 'Metadata',
+  entity_concordance: 'Entity Concordance',
+  relation_concordance: 'Relation Concordance',
   action: 'Action',
   annotate: 'Annotate',
   importDataTitle: 'Upload Data',

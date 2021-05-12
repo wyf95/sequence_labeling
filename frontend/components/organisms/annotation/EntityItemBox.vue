@@ -18,7 +18,7 @@
         />
       </div>
     </v-card-text>
-    <span v-text="users[index].name" style="float:right; margin-right:30px;"></span>
+    <span class="user-name" v-text="users[index].name" style="float:right; margin-right:30px;"></span>
   </v-card>
 
   <v-menu
@@ -97,6 +97,11 @@ export default {
       default: '',
       required: true
     },
+    user: {
+      type: String,
+      default: '',
+      required: true
+    },
     labels: {
       type: Array,
       default: () => ([]),
@@ -169,60 +174,37 @@ export default {
   },
 
   computed: {
-    sortedEntities() {
-      return this.entities.slice().sort((a, b) => a.start_offset - b.start_offset)
-    },
-
     chunksList() {
       let chunksList = []
       this.users = []
-      // 当前用户名
-      var currentUser = document.getElementById('current_user').innerText
+
+      // 将entity按user分组
+      var entities = this.entities.slice().sort((a, b) => a.start_offset - b.start_offset)
+      this.entitiesList = lodash.groupBy(entities, 'username')
       
-      if (this.sortedEntities.length === 0) { 
-        // 无实体
+      // 加入当前用户
+      if (!this.entitiesList[this.user]) {
         chunksList.push(this.makeChunks(this.text.slice(0, this.text.length)))
-        this.users.push({name: currentUser, id: null, offset: 0})
+        this.users.push({name: this.user, id: null})
+        this.entitiesList[this.user] = []
       } else {
-        this.entitiesList = lodash.groupBy(this.sortedEntities, 'username')
-        // 只有一组实体，且为当前用户
-        if (Object.keys(this.entitiesList).length === 1 && Object.hasOwnProperty.call(this.entitiesList, currentUser)) {
-          const entities = this.entitiesList[currentUser];
-          chunksList.push(this.getChunks(entities))
-          this.users.push({name: currentUser, id: null, offset: 0})
-        } else {
-          // 多组实体
-          // 无当前用户
-          if (!Object.hasOwnProperty.call(this.entitiesList, currentUser)) {
-            var off = 0
-            chunksList.push(this.makeChunks(this.text.slice(0, this.text.length)))
-            this.users.push({name: currentUser, id: null, offset: off})
-            off = off + currentUser.length + 1
-            for (const key in this.entitiesList) {
-              if (Object.hasOwnProperty.call(this.entitiesList, key)) {
-                const entities = this.entitiesList[key];
-                chunksList.push(this.getChunks(entities))
-                this.users.push({name: key, id: entities[0].user, offset: off})
-                off = off + key.length + 1
-              }
-            }
-          } else {
-            // 有当前用户
-            var off = 0
-            chunksList.push(this.getChunks(this.entitiesList[currentUser]))
-            this.users.push({name: currentUser, id: null, offset: off})
-            off = off + currentUser.length + 1
-            for (const key in this.entitiesList) {
-              if (Object.hasOwnProperty.call(this.entitiesList, key) && key !== currentUser) {
-                const entities = this.entitiesList[key];
-                chunksList.push(this.getChunks(entities))
-                this.users.push({name: key, id: entities[0].user, offset: off})
-                off = off + key.length + 1
-              }
-            }
-          }
-        }
+        const entities = this.entitiesList[this.user]
+        chunksList.push(this.getChunks(entities))
+        this.users.push({name: this.user, id: entities[0].user})
       }
+
+      // 加入其他用户
+      let userSorted = Object.keys(this.entitiesList).sort()
+      for (const key in userSorted) {
+        let user = userSorted[key]
+        if (user === this.user) {
+          continue
+        }
+        const entities = this.entitiesList[user];
+        chunksList.push(this.getChunks(entities))
+        this.users.push({name: user, id: entities[0].user})
+      }
+
       this.$nextTick(() => {
         this.loadChart()
       })
@@ -318,8 +300,8 @@ export default {
         this.$nextTick(() => {
           this.loadNode()
           this.loadLine()
+          this.showConnection()
         })
-        this.showConnection()
 
         // 连线
         this.jsPlumb.bind("connection", (evt) => {
@@ -527,15 +509,20 @@ export default {
       preSelectionRange.setEnd(range.startContainer, range.startOffset)
       this.start = [...preSelectionRange.toString()].length
       this.end = this.start + [...range.toString()].length
-      
-      // 选中第i栏，对应users[i]
-      this.choseUser = parseInt(this.start / this.text.length)
 
-      this.start = this.start % this.text.length - this.users[this.choseUser].offset
-      this.end = this.end % this.text.length - this.users[this.choseUser].offset
+      let i = 0
+      while (this.start > this.text.length && i < this.users.length) {
+        this.start = this.start - this.text.length - this.users[i].name.length - 1
+        this.end = this.end - this.text.length - this.users[i].name.length - 1
+        i = i + 1
+      }
+      this.choseUser = i
     },
     
     validateSpan() {
+      if (!this.users[this.choseUser]) {
+        return false
+      }
       if ((typeof this.start === 'undefined') || (typeof this.end === 'undefined')) {
         return false
       }

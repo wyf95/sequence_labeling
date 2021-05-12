@@ -5,6 +5,8 @@ export default {
   exportDataset: '导出数据集',
   text: '文本',
   metadata: '元数据',
+  entity_concordance: '实体一致性',
+  relation_concordance: '关系一致性',
   action: '操作',
   annotate: '标注',
   importDataTitle: '上传数据',

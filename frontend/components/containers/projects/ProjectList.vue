@@ -50,6 +50,14 @@ export default {
         {
           text: this.$t('generic.description'),
           value: 'description'
+        },
+        {
+          text: this.$t('generic.entity_concordance'),
+          value: 'entity_concordance'
+        },
+        {
+          text: this.$t('generic.relation_concordance'),
+          value: 'relation_concordance'
         }
       ]
     }

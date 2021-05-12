@@ -15,6 +15,8 @@ export default {
   import: 'Import',
   export: 'Export',
   description: 'Description',
+  entity_concordance: 'Entity Concordance',
+  relation_concordance: 'Relation Concordance',
   type: 'Type',
   loading: 'Loading... Please wait'
 }

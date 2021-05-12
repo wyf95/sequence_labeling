@@ -90,10 +90,6 @@ export const getters = {
 
   },
   getExportFormat(state) {
-    const csv = {
-      type: 'csv',
-      text: 'CSV'
-    }
     const json = {
       type: 'json',
       text: 'JSONL'
@@ -104,9 +100,9 @@ export const getters = {
     }
     
     json.examples = [
-      '{"id": 1, "text": "EU rejects ...", "annotations": [{"id": 1, "label": 2, "start_offset": 0, "end_offset": 2, "user": 1}]}\n',
-      '{"id": 2, "text": "Peter Blackburn", "annotations": [{"id": 2, "label": 1, "start_offset": 0, "end_offset": 15, "user": 1}]}\n',
-      '{"id": 3, "text": "President Obama", "annotations": [{"id": 3, "label": 1, "start_offset": 10, "end_offset": 15, "user": 1}]}'
+      '{"id": 1, "text": "EU rejects ...", "annotations": [{"id": 1, "label": "2", "start_offset": 0, "end_offset": 2, "username": 1}], "connecntions": [{"source": 1, "to": 2, "relation": null}]}\n',
+      '{"id": 2, "text": "Peter Blackburn", "annotations": [{"id": 2, "label": "1", "start_offset": 0, "end_offset": 15, "username": 1}], "connecntions": [{"source": 2, "to": 1, "relation": null}]}\n',
+      '{"id": 3, "text": "President Obama", "annotations": [{"id": 3, "label": "1", "start_offset": 10, "end_offset": 15, "username": 1}], "connecntions": [{"source": 1, "to": 3, "relation": null}]}'
     ]
     jsonl.examples = [
       '{"id": 1, "text": "EU rejects ...", "labels": [[0,2,"ORG"], [11,17, "MISC"], [34,41,"ORG"]]}\n',

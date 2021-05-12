@@ -77,6 +77,18 @@ export default {
           sortable: false
         },
         {
+          text: this.$t('dataset.entity_concordance'),
+          align: 'left',
+          value: 'entity_concordance',
+          sortable: false
+        },
+        {
+          text: this.$t('dataset.relation_concordance'),
+          align: 'left',
+          value: 'relation_concordance',
+          sortable: false
+        },
+        {
           text: this.$t('dataset.action'),
           align: 'left',
           value: 'action',

@@ -65,11 +65,6 @@ class DocumentSerializer(serializers.ModelSerializer):
         model = project.get_annotation_class()
         serializer = project.get_annotation_serializer()
         annotations = model.objects.filter(document=instance.id)
-        
-        request = self.context.get('request')
-        if request:
-            if not request.user.is_superuser:
-                annotations = annotations.filter(user=request.user.id)
 
         serializer = serializer(annotations, many=True)
         return serializer.data
@@ -89,7 +84,7 @@ class DocumentSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Document
-        fields = ('id', 'text', 'annotations', 'connections', 'annotation_approver')
+        fields = ('id', 'text', 'annotations', 'connections', 'annotation_approver', 'entity_concordance', 'relation_concordance')
 
 
 class ApproverSerializer(DocumentSerializer):
@@ -127,7 +122,7 @@ class ProjectSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Project
-        fields = ('id', 'name', 'description', 'guideline', 'users', 'current_users_role', 'updated_at')
+        fields = ('id', 'name', 'description', 'guideline', 'users', 'entity_concordance', 'relation_concordance', 'current_users_role', 'updated_at')
         read_only_fields = ('updated_at', 'users', 'current_users_role')
 
 

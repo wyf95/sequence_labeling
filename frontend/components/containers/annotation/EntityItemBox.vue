@@ -1,10 +1,11 @@
 <template>
   <entity-item-box
     v-if="isReady"
+    :user="current_user"
     :labels="items"
     :relations="relationItems"
     :text="currentDoc.text"
-    :entities="currentDoc.annotations"
+    :entities="annotations"
     :connections="currentDoc.connections"
     :update-entity="updateEntity"
     :add-entity="addEntity"
@@ -29,8 +30,19 @@ export default {
     ...mapState('relations', ['relationItems', 'loading']),
     ...mapState('documents', { documentLoading: 'loading' }),
     ...mapGetters('documents', ['currentDoc']),
+    ...mapGetters('projects', ['getCurrentUserRole']),
     isReady() {
       return !!this.currentDoc && !this.loading && !this.documentLoading
+    },
+    current_user() {
+      return document.getElementById('current_user').innerText
+    },
+    annotations() {
+      if (this.getCurrentUserRole.is_annotator) {
+        return this.currentDoc.annotations.filter(item => item.username === this.current_user)
+      } else {
+        return this.currentDoc.annotations
+      }
     }
   },
 
