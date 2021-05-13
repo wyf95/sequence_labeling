@@ -1,5 +1,5 @@
 export default {
-  mainTitle: '文本标注平台',
+  mainTitle: '实体与关系标注平台',
   getStarted: '快速开始',
   startAnnotation: '开始标注',
   footerTitle: '尽快实现你的想法',
