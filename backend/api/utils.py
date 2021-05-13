@@ -254,10 +254,9 @@ class PlainTextParser(FileParser):
         file = io.TextIOWrapper(file, encoding=file.encoding)
         while True:
             batch = list(itertools.islice(file, settings.IMPORT_BATCH_SIZE))
-            print('spliter: ' + spliter)
+
             if spliter and spliter != '' and batch:
                 batch_str = ''.join(batch)
-                # print(batch_str)
                 if spliter in batch_str:
                     batch = batch_str.split(spliter)
                     while '' in batch:
@@ -267,7 +266,7 @@ class PlainTextParser(FileParser):
                 else:
                     batch = []
                     batch.append(batch_str)
-            print(batch)
+                    
             if not batch:
                 break
 

@@ -229,12 +229,6 @@ def comput_annotation_concordance(instance):
     document.entity_concordance = f
     document.save()
 
-    project = document.project
-    documents = Document.objects.filter(project=project.id)
-    documents_entity_concordance = np.array([k.entity_concordance for k in documents])
-    project.entity_concordance = documents_entity_concordance.mean()
-    project.save()
-
 def comput_relation_concordance(instance):
     documentInstance = instance.document
     if not documentInstance:
@@ -277,8 +271,13 @@ def comput_relation_concordance(instance):
     document.relation_concordance = f
     document.save()
 
-    project = document.project
+def comput_project_concordance(instance):
+    project = instance.project
+    if not project:
+        return
     documents = Document.objects.filter(project=project.id)
+    documents_entity_concordance = np.array([k.entity_concordance for k in documents])
+    project.entity_concordance = documents_entity_concordance.mean()
     documents_relation_concordance = np.array([k.relation_concordance for k in documents])
     project.relation_concordance = documents_relation_concordance.mean()
     project.save()
@@ -298,6 +297,14 @@ def save_connection_comput_concordance(sender, instance, created, **kwargs):
 @receiver(post_delete, sender=Connection)
 def delete_connection_comput_concordance(sender, instance, using, **kwargs):
     comput_relation_concordance(instance)
+
+@receiver(post_save, sender=Document)
+def save_document_comput_concordance(sender, instance, created, **kwargs):
+    comput_project_concordance(instance)
+
+@receiver(post_delete, sender=Document)
+def delete_document_comput_concordance(sender, instance, using, **kwargs):
+    comput_project_concordance(instance)
 
 
 @receiver(post_save, sender=RoleMapping)
