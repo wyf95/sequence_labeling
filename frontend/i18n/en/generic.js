@@ -18,5 +18,6 @@ export default {
   entity_concordance: 'Entity Concordance',
   relation_concordance: 'Relation Concordance',
   type: 'Type',
-  loading: 'Loading... Please wait'
+  loading: 'Loading... Please wait',
+  systemName: 'Entity and Relation Annotation'
 }

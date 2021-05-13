@@ -24,9 +24,9 @@ from drf_yasg import openapi
 # TODO: adds AnnotationList and AnnotationDetail endpoint.
 schema_view = get_schema_view(
    openapi.Info(
-      title="doccano API",
+      title="Entity and Relation Annotation API",
       default_version='v1',
-      description="doccano API description",
+      description="Entity and Relation Annotation API description",
       license=openapi.License(name="MIT License"),
    ),
    public=True,

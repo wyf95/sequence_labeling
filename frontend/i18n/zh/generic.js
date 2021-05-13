@@ -18,5 +18,6 @@ export default {
   entity_concordance: '实体一致性',
   relation_concordance: '关系一致性',
   type: '类型',
-  loading: '加载中... 请等待'
+  loading: '加载中... 请等待',
+  systemName: '实体与关系标注平台'
 }

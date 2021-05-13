@@ -13,7 +13,7 @@
     <v-toolbar-title
       class="ml-2 d-none d-sm-flex"
     >
-      sequence labeling
+      {{ $t('generic.systemName') }}
     </v-toolbar-title>
     <v-btn
       v-if="isAuthenticated && isIndividualProject"
