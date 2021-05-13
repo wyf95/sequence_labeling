@@ -14,5 +14,5 @@ export default {
   importMessage1: 'Example format',
   importMessage2: 'Select a file',
   filePlaceholder: 'File input',
-  spliterPlaceholder: 'Input a split symbol(or split by lines for no input, refuse empty lines)'
+  spliterPlaceholder: 'Input a split symbol(or split by lines and refuse empty line for no input)'
 }
