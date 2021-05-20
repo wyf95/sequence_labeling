@@ -56,15 +56,6 @@ INSTALLED_APPS = [
     'api.apps.ApiConfig'
 ]
 
-CLOUD_BROWSER_APACHE_LIBCLOUD_PROVIDER = env('CLOUD_BROWSER_LIBCLOUD_PROVIDER', None)
-CLOUD_BROWSER_APACHE_LIBCLOUD_ACCOUNT = env('CLOUD_BROWSER_LIBCLOUD_ACCOUNT', None)
-CLOUD_BROWSER_APACHE_LIBCLOUD_SECRET_KEY = env('CLOUD_BROWSER_LIBCLOUD_KEY', None)
-
-if CLOUD_BROWSER_APACHE_LIBCLOUD_PROVIDER:
-    CLOUD_BROWSER_DATASTORE = 'ApacheLibcloud'
-    CLOUD_BROWSER_OBJECT_REDIRECT_URL = '/v1/cloud-upload'
-    INSTALLED_APPS.append('cloud_browser')
-
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'whitenoise.middleware.WhiteNoiseMiddleware',
@@ -233,29 +224,6 @@ if DATABASES['default'].get('ENGINE') == 'sql_server.pyodbc':
     DATABASES['default'].setdefault('OPTIONS', {})\
         .setdefault('driver', 'ODBC Driver 17 for SQL Server')
 
-# Honor the 'X-Forwarded-Proto' header for request.is_secure()
-SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
-SESSION_COOKIE_SECURE = env.bool('SESSION_COOKIE_SECURE', False)
-CSRF_COOKIE_SECURE = env.bool('CSRF_COOKIE_SECURE', False)
-CSRF_TRUSTED_ORIGINS = env.list('CSRF_TRUSTED_ORIGINS', [])
-
-
 # Size of the batch for creating documents
 # on the import phase
 IMPORT_BATCH_SIZE = env.int('IMPORT_BATCH_SIZE', 500)
-
-GOOGLE_TRACKING_ID = env('GOOGLE_TRACKING_ID', 'UA-125643874-2').strip()
-
-AZURE_APPINSIGHTS_IKEY = env('AZURE_APPINSIGHTS_IKEY', None)
-APPLICATION_INSIGHTS = {
-    'ikey': AZURE_APPINSIGHTS_IKEY if AZURE_APPINSIGHTS_IKEY else None,
-    'endpoint': env('AZURE_APPINSIGHTS_ENDPOINT', None),
-}
-
-# necessary for email verification of new accounts
-EMAIL_USE_TLS = env.bool('EMAIL_USE_TLS', False)
-EMAIL_HOST = env('EMAIL_HOST', None)
-EMAIL_HOST_USER = env('EMAIL_HOST_USER', None)
-EMAIL_HOST_PASSWORD = env('EMAIL_HOST_PASSWORD', None)
-EMAIL_PORT = env.int('EMAIL_PORT', 587)
-DEFAULT_FROM_EMAIL = env('DEFAULT_FROM_EMAIL', 'webmaster@localhost')

@@ -9,8 +9,6 @@ from django.db.utils import IntegrityError
 from django.shortcuts import get_object_or_404, redirect
 from django_filters.rest_framework import DjangoFilterBackend
 from django.db.models import Count, F, Q
-from libcloud.base import DriverType, get_driver
-from libcloud.storage.types import ContainerDoesNotExistError, ObjectDoesNotExistError
 from rest_framework import generics, filters, status
 from rest_framework.exceptions import ParseError, ValidationError
 from rest_framework.permissions import IsAuthenticated, IsAuthenticatedOrReadOnly

@@ -96,6 +96,10 @@ python3 manage.py create_admin
 
 # 运行
 python3 manage.py runserver 0.0.0.0:8000
+	# or
+	# ln -s /usr/local/bin/python3/bin/gunicorn /usr/bin/gunicorn
+gunicorn --bind="0.0.0.0:8000" --workers="4" backend.wsgi --timeout 300
+# nohup gunicorn --bind="0.0.0.0:8000" --workers="4" backend.wsgi --timeout 300 > sq_backend.log 2>&1 &
 
 # 运行地址 127.0.0.1:3000
 # 后台地址 127.0.0.1:8000/admin

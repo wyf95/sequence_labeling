@@ -39,6 +39,3 @@ urlpatterns = [
     path('v1/', include('api.urls')),
     # re_path('', TemplateView.as_view(template_name='index.html')),
 ]
-
-if 'cloud_browser' in settings.INSTALLED_APPS:
-    urlpatterns.append(path('cloud-storage/', include('cloud_browser.urls')))
