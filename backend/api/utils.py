@@ -5,7 +5,6 @@ import itertools
 import json
 import mimetypes
 import re
-from collections import defaultdict
 
 import conllu
 from chardet import UniversalDetector
@@ -14,7 +13,6 @@ from django.conf import settings
 from colour import Color
 import pyexcel
 from rest_framework.renderers import JSONRenderer
-from seqeval.metrics.sequence_labeling import get_entities
 
 from .exceptions import FileParseException
 from .models import Label, User, Relation

@@ -15,15 +15,11 @@ export default {
       { hid: 'description', name: 'description', content: process.env.npm_package_description || '' }
     ],
     script: [
-      { src: 'https://use.fontawesome.com/releases/v5.0.6/js/all.js' }
+      { src: '/fontawesome.js' }
     ],
     link: [
       { rel: 'icon', type: 'image/x-icon', href: '/favicon.ico' },
-      {
-        rel: 'stylesheet',
-        href:
-          'https://fonts.googleapis.com/css?family=Roboto:300,400,500,700|Material+Icons'
-      }
+      { rel: 'stylesheet', href:'/gstatic.css' }
     ]
   },
 
@@ -44,6 +40,7 @@ export default {
   ** Global CSS
   */
   css: [
+    '@mdi/font/css/materialdesignicons.css'
   ],
   /*
   ** Plugins to load before mounting the App
@@ -58,7 +55,6 @@ export default {
   modules: [
     ['nuxt-i18n', i18n],
     '@nuxtjs/vuetify',
-    // Doc: https://axios.nuxtjs.org/usage
     '@nuxtjs/axios',
     '@nuxtjs/eslint-module'
   ],

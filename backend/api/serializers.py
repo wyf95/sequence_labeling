@@ -4,7 +4,7 @@ from django.shortcuts import get_object_or_404
 from rest_framework import serializers
 from rest_framework.exceptions import ValidationError
 
-from .models import Label, Project, Document, RoleMapping, Role, User
+from .models import Label, Project, Document, RoleMapping, Role
 from .models import SequenceAnnotation, Connection, Relation
 
 

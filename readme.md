@@ -85,6 +85,7 @@ pip install -r requirments.txt
 # 清空数据库
 # 删除api/migrations下除__init__.py的所有文件
 # 删除db.sqlite3文件
+
 # 数据库创建/更新
 python3 manage.py makemigrations
 python3 manage.py migrate
@@ -96,8 +97,9 @@ python3 manage.py create_admin
 
 # 运行
 python3 manage.py runserver 0.0.0.0:8000
-	# or
-	# ln -s /usr/local/bin/python3/bin/gunicorn /usr/bin/gunicorn
+
+# 由gunicorn部署
+# ln -s /usr/local/bin/python3/bin/gunicorn /usr/bin/gunicorn
 gunicorn --bind="0.0.0.0:8000" --workers="4" backend.wsgi --timeout 300
 # nohup gunicorn --bind="0.0.0.0:8000" --workers="4" backend.wsgi --timeout 300 > sq_backend.log 2>&1 &
 
@@ -132,6 +134,8 @@ nginx -t
 ## 3.1 数据
 
 **【导入数据】**
+
+**请注意使用UTF-8编码格式的文件**
 
 对于TXT文件：
 

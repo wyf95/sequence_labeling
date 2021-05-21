@@ -12,6 +12,7 @@ djangorestframework-filters==0.10.2
 drf-yasg==1.17.1
 environs==4.1.0
 djangorestframework-xml==1.4.0
+gunicorn==20.1.0
 furl==2.0.0
 pyexcel==0.5.14
 seqeval==0.0.6

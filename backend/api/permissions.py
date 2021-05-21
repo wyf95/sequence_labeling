@@ -1,5 +1,4 @@
 from django.conf import settings
-from django.contrib.auth.mixins import UserPassesTestMixin
 from django.db.models import Subquery
 from django.shortcuts import get_object_or_404
 from rest_framework.permissions import BasePermission, SAFE_METHODS, IsAdminUser

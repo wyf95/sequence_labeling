@@ -6,9 +6,7 @@ from django.dispatch import receiver
 from django.db.models import Count
 from django.db.models.signals import post_save, pre_delete, post_delete
 from django.urls import reverse
-from django.conf import settings
 from django.contrib.auth.models import User
-from django.contrib.staticfiles.storage import staticfiles_storage
 from django.core.exceptions import ValidationError
 
 from .managers import AnnotationManager

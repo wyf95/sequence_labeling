@@ -2,11 +2,10 @@ import collections
 import json
 import random
 
-from django.conf import settings
 from django.contrib.auth.models import User
 from django.db import transaction
 from django.db.utils import IntegrityError
-from django.shortcuts import get_object_or_404, redirect
+from django.shortcuts import get_object_or_404
 from django_filters.rest_framework import DjangoFilterBackend
 from django.db.models import Count, F, Q
 from rest_framework import generics, filters, status
@@ -22,7 +21,7 @@ from .models import Project, Label, Document, RoleMapping, Role, Relation
 from .permissions import IsProjectAdmin, IsAnnotatorAndReadOnly, IsAnnotator, IsAnnotationApproverAndReadOnly, IsAnnotationApprover
 from .serializers import ProjectSerializer, LabelSerializer, DocumentSerializer, UserSerializer, ApproverSerializer, RelationSerializer
 from .serializers import RoleMappingSerializer, RoleSerializer
-from .utils import CSVParser, ExcelParser, JSONParser, PlainTextParser, CoNLLParser, AudioParser, iterable_to_io
+from .utils import CSVParser, ExcelParser, JSONParser, PlainTextParser, CoNLLParser, AudioParser
 from .utils import JSONLRenderer
 from .utils import JSONPainter, CSVPainter
 
