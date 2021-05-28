@@ -60,7 +60,8 @@ class DocumentSerializer(serializers.ModelSerializer):
     annotations = serializers.SerializerMethodField()
     connections = serializers.SerializerMethodField()
     annotation_approver = serializers.SerializerMethodField()
-    assign = serializers.SerializerMethodField()
+    annotator_assign = serializers.SerializerMethodField()
+    approver_assign = serializers.SerializerMethodField()
 
     def get_annotations(self, instance):
         project = instance.project
@@ -78,7 +79,7 @@ class DocumentSerializer(serializers.ModelSerializer):
         serializer = serializer(connections, many=True)
         return serializer.data
     
-    def get_assign(self, instance):
+    def get_annotator_assign(self, instance):
         project = instance.project
         model = project.get_docmapping_class()
         serializer = project.get_docmapping_serializer()
@@ -87,7 +88,23 @@ class DocumentSerializer(serializers.ModelSerializer):
         data = serializer.data
         users = []
         for i in data:
-            users.append(i['username'])
+            role = str(RoleMapping.objects.get(project=project, user=i['user']).role)
+            if role == 'annotator':
+                users.append(i['username'])
+        return users
+    
+    def get_approver_assign(self, instance):
+        project = instance.project
+        model = project.get_docmapping_class()
+        serializer = project.get_docmapping_serializer()
+        assign = model.objects.filter(document=instance.id)
+        serializer = serializer(assign, many=True)
+        data = serializer.data
+        users = []
+        for i in data:
+            role = str(RoleMapping.objects.get(project=project, user=i['user']).role)
+            if role == 'annotation_approver':
+                users.append(i['username'])
         return users
 
     @classmethod
@@ -97,7 +114,7 @@ class DocumentSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Document
-        fields = ('id', 'text', 'annotations', 'connections', 'annotation_approver', 'assign', 'entity_concordance', 'relation_concordance')
+        fields = ('id', 'text', 'annotations', 'connections', 'annotation_approver', 'annotator_assign', 'approver_assign', 'entity_concordance', 'relation_concordance')
 
 
 class ApproverSerializer(DocumentSerializer):

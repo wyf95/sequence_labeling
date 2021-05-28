@@ -77,9 +77,15 @@ export default {
           sortable: false
         },
         {
-          text: this.$t('dataset.assign'),
+          text: this.$t('dataset.annotator_assign'),
           align: 'left',
-          value: 'assign',
+          value: 'annotator_assign',
+          sortable: false
+        },
+        {
+          text: this.$t('dataset.approver_assign'),
+          align: 'left',
+          value: 'approver_assign',
           sortable: false
         },
         {

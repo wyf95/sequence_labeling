@@ -175,8 +175,9 @@ export const actions = {
 
   addDocMapping({ commit, state }, payload) {
     for (const document of state.selected) {
-      var assign = state.items.find(item => item.id === document.id).assign.find(item => item === payload.username)
-      if (assign) {
+      var annotator_assign = state.items.find(item => item.id === document.id).annotator_assign.find(item => item === payload.username)
+      var approver_assign = state.items.find(item => item.id === document.id).approver_assign.find(item => item === payload.username)
+      if (annotator_assign || approver_assign) {
         continue
       }
       DocumentService.addDocMapping(payload.projectId, {document:document.id, user:payload.userId})
