@@ -6,19 +6,19 @@
       outlined
       @click="dialog=true"
     >
-      {{ $t('generic.delete') }}
+      {{ $t('dataset.delMapping') }}
     </v-btn>
     <v-dialog
       v-model="dialog"
       width="800"
     >
       <confirm-form
-        :title="$t('dataset.deleteDocumentsTitle')"
-        :message="$t('dataset.deleteDocumentsMessage')"
+        :title="$t('dataset.deleteDocMappingTitle')"
+        :message="$t('dataset.deleteDocMappingMessage')"
         :button-true-text="$t('generic.yes')"
         :button-false-text="$t('generic.cancel')"
         item-key="text"
-        @ok="deleteDocument($route.params.id);dialog=false"
+        @ok="deleteAssign($route.params.id);dialog=false"
         @cancel="dialog=false"
       />
     </v-dialog>
@@ -46,7 +46,14 @@ export default {
   },
 
   methods: {
-    ...mapActions('documents', ['deleteDocument'])
+    ...mapActions('documents', ['deleteDocMapping', 'getDocumentList']),
+
+    deleteAssign(id) {
+      this.deleteDocMapping(id)
+      this.getDocumentList({
+        projectId: this.$route.params.id
+      })
+    }
   }
 }
 </script>

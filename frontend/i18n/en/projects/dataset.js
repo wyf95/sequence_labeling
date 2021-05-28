@@ -3,7 +3,10 @@ export default {
   actions: 'Actions',
   importDataset: 'Import Dataset',
   exportDataset: 'Export Dataset',
+  addMapping: 'Assign Data',
+  delMapping: 'Delete Assign',
   text: 'Text',
+  assign: 'Assign',
   metadata: 'Metadata',
   entity_concordance: 'Entity Concordance',
   relation_concordance: 'Relation Concordance',
@@ -17,5 +20,7 @@ export default {
   exportDataMessage: 'Select a file format',
   deleteDocumentsTitle: 'Delete Document',
   deleteDocumentsMessage: 'Are you sure you want to delete these documents from this project?',
+  deleteDocMappingTitle: 'Delete Assign',
+  deleteDocMappingMessage: 'Are you sure you want to delete these assignment of documents from this project?',
   pageText: '{0}-{1} of {2}'
 }

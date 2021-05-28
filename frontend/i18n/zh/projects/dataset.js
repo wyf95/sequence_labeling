@@ -3,7 +3,10 @@ export default {
   actions: '操作',
   importDataset: '导入数据集',
   exportDataset: '导出数据集',
+  addMapping: '分配数据',
+  delMapping: '删除分配',
   text: '文本',
+  assign: '分配',
   metadata: '元数据',
   entity_concordance: '实体一致性',
   relation_concordance: '关系一致性',
@@ -17,5 +20,7 @@ export default {
   exportDataMessage: '请选择文件格式',
   deleteDocumentsTitle: '删除文档',
   deleteDocumentsMessage: '你确定要从这个项目中删除这些文档吗？',
+  deleteDocMappingTitle: '删除分配',
+  deleteDocMappingMessage: '你确定要从这个项目中删除对这些文档的成员分配吗？',
   pageText: '{0}-{1} of {2}'
 }

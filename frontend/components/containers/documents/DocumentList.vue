@@ -77,6 +77,12 @@ export default {
           sortable: false
         },
         {
+          text: this.$t('dataset.assign'),
+          align: 'left',
+          value: 'assign',
+          sortable: false
+        },
+        {
           text: this.$t('dataset.entity_concordance'),
           align: 'left',
           value: 'entity_concordance',

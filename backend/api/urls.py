@@ -11,17 +11,20 @@ from .views import ConnectionList, ConnectionDetail
 from .views import TextUploadAPI, TextDownloadAPI
 from .views import StatisticsAPI
 from .views import RoleMappingList, RoleMappingDetail, Roles
+from .views import DocMappingList, DocMappingDetail
 
 urlpatterns = [
     path('health', Health.as_view(), name='health'),
     path('auth-token', obtain_auth_token),
     path('me', Me.as_view(), name='me'),
-    path('projects', ProjectList.as_view(), name='project_list'),
     path('users', Users.as_view(), name='user_list'),
     path('roles', Roles.as_view(), name='roles'),
+    
+    path('projects', ProjectList.as_view(), name='project_list'),
     path('projects/<int:project_id>', ProjectDetail.as_view(), name='project_detail'),
-    path('projects/<int:project_id>/statistics',
-         StatisticsAPI.as_view(), name='statistics'),
+    
+    path('projects/<int:project_id>/statistics', StatisticsAPI.as_view(), name='statistics'),
+
     path('projects/<int:project_id>/labels',
          LabelList.as_view(), name='label_list'),
     path('projects/<int:project_id>/label-upload',
@@ -40,6 +43,7 @@ urlpatterns = [
          DocumentList.as_view(), name='doc_list'),
     path('projects/<int:project_id>/docs/<int:doc_id>',
          DocumentDetail.as_view(), name='doc_detail'),
+
     path('projects/<int:project_id>/docs/<int:doc_id>/approve-labels',
          ApproveLabelsAPI.as_view(), name='approve_labels'),
     path('projects/<int:project_id>/docs/<int:doc_id>/annotations',
@@ -60,4 +64,9 @@ urlpatterns = [
          RoleMappingList.as_view(), name='rolemapping_list'),
     path('projects/<int:project_id>/roles/<int:rolemapping_id>',
          RoleMappingDetail.as_view(), name='rolemapping_detail'),
+
+    path('projects/<int:project_id>/docmappings',
+         DocMappingList.as_view(), name='docmapping_list'),
+    path('projects/<int:project_id>/docmappings/<int:doc_id>',
+         DocMappingDetail.as_view(), name='docmapping_detail'),
 ]

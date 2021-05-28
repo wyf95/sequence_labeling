@@ -3,7 +3,7 @@ from django.db.models import Subquery
 from django.shortcuts import get_object_or_404
 from rest_framework.permissions import BasePermission, SAFE_METHODS, IsAdminUser
 
-from .models import Project, Role, RoleMapping
+from .models import Role, RoleMapping
 
 
 class ProjectMixin:
@@ -17,7 +17,6 @@ class IsAdminUserAndReadOnly(BasePermission):
     def has_permission(self, request, view):
         if request.method in SAFE_METHODS:
             return True
-        print('----IsAdminUserAndReadOnly: ' + str(IsAdminUser().has_permission(request, view)))
         return IsAdminUser().has_permission(request, view)
 
 

@@ -5,6 +5,7 @@
       :text="$t('dataset.actions')"
       @upload="importDialog=true"
       @download="exportDialog=true"
+      @addmapping="addAssignDialog=true"
     />
     <v-dialog
       v-model="importDialog"
@@ -26,11 +27,20 @@
         @close="exportDialog=false"
       />
     </v-dialog>
+    <v-dialog
+      v-model="addAssignDialog"
+      width="800"
+    >
+      <document-add-mapping-form
+        :upload-document="uploadDocument"
+        @close="addAssignDialog=false"
+      />
+    </v-dialog>
   </div>
 </template>
 
 <script>
-import { mapActions, mapGetters } from 'vuex'
+import { mapActions, mapGetters, mapState } from 'vuex'
 import ActionMenu from '@/components/molecules/ActionMenu'
 import DocumentUploadForm from '@/components/organisms/documents/DocumentUploadForm'
 import DocumentExportForm from '@/components/organisms/documents/DocumentExportForm'
@@ -46,6 +56,7 @@ export default {
     return {
       importDialog: false,
       exportDialog: false,
+      addAssignDialog: false,
       menuItems: [
         { title: this.$t('dataset.importDataset'), icon: 'mdi-upload', event: 'upload' },
         { title: this.$t('dataset.exportDataset'), icon: 'mdi-download', event: 'download' }
@@ -54,6 +65,7 @@ export default {
   },
 
   computed: {
+    ...mapState('documents', ['selected']),
     ...mapGetters('projects', ['getImportFormat', 'getExportFormat'])
   },
 

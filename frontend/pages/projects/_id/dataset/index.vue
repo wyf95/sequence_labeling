@@ -3,6 +3,8 @@
     <v-card-title class="mb-2">
       <document-action-menu />
       <document-deletion-button class="ms-2" />
+      <document-del-mapping-button class="ms-2" />
+      <document-add-mapping-button class="ms-2" />
     </v-card-title>
     <document-list />
   </v-card>
@@ -12,6 +14,8 @@
 import DocumentList from '@/components/containers/documents/DocumentList'
 import DocumentActionMenu from '@/components/containers/documents/DocumentActionMenu'
 import DocumentDeletionButton from '@/components/containers/documents/DocumentDeletionButton'
+import DocumentDelMappingButton from '@/components/containers/documents/DocumentDelMappingButton'
+import DocumentAddMappingButton from '@/components/containers/documents/DocumentAddMappingButton'
 
 export default {
   layout: 'project',
@@ -19,7 +23,9 @@ export default {
   components: {
     DocumentList,
     DocumentActionMenu,
-    DocumentDeletionButton
+    DocumentDeletionButton,
+    DocumentDelMappingButton,
+    DocumentAddMappingButton
   },
 
   validate({ params, query }) {

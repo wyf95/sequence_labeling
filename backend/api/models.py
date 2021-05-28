@@ -49,6 +49,13 @@ class Project(models.Model):
 
     def get_connection_class(self):
         return Connection
+    
+    def get_docmapping_serializer(self):
+        from .serializers import DocMappingSerializer
+        return DocMappingSerializer
+
+    def get_docmapping_class(self):
+        return DocMapping
 
     def get_storage(self, data):
         from .utils import SequenceLabelingStorage
@@ -180,6 +187,14 @@ class RoleMapping(models.Model):
     class Meta:
         unique_together = ("user", "project", "role")
 
+class DocMapping(models.Model):
+    project = models.ForeignKey(Project, related_name='doc_mappings', on_delete=models.CASCADE)
+    user = models.ForeignKey(User, related_name='doc_mappings', on_delete=models.CASCADE)
+    document = models.ForeignKey(Document, on_delete=models.CASCADE)
+
+    class Meta:
+        unique_together = ("project", "user", "document")
+
 
 
 def fleiss(table, n):
@@ -274,11 +289,16 @@ def comput_project_concordance(instance):
     if not project:
         return
     documents = Document.objects.filter(project=project.id)
-    documents_entity_concordance = np.array([k.entity_concordance for k in documents])
-    project.entity_concordance = documents_entity_concordance.mean()
-    documents_relation_concordance = np.array([k.relation_concordance for k in documents])
-    project.relation_concordance = documents_relation_concordance.mean()
-    project.save()
+    if len(documents) != 0:
+        documents_entity_concordance = np.array([k.entity_concordance for k in documents])
+        project.entity_concordance = documents_entity_concordance.mean()
+        documents_relation_concordance = np.array([k.relation_concordance for k in documents])
+        project.relation_concordance = documents_relation_concordance.mean()
+        project.save()
+    else:
+        project.entity_concordance = 1.0
+        project.relation_concordance = 1.0
+        project.save()
 
 @receiver(post_save, sender=SequenceAnnotation)
 def save_annotation_comput_concordance(sender, instance, created, **kwargs):

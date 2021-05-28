@@ -3,8 +3,9 @@ from django.contrib.auth import get_user_model
 from django.shortcuts import get_object_or_404
 from rest_framework import serializers
 from rest_framework.exceptions import ValidationError
+from django.db.models import Subquery
 
-from .models import Label, Project, Document, RoleMapping, Role
+from .models import Label, Project, Document, RoleMapping, Role, DocMapping
 from .models import SequenceAnnotation, Connection, Relation
 
 
@@ -59,13 +60,13 @@ class DocumentSerializer(serializers.ModelSerializer):
     annotations = serializers.SerializerMethodField()
     connections = serializers.SerializerMethodField()
     annotation_approver = serializers.SerializerMethodField()
+    assign = serializers.SerializerMethodField()
 
     def get_annotations(self, instance):
         project = instance.project
         model = project.get_annotation_class()
         serializer = project.get_annotation_serializer()
         annotations = model.objects.filter(document=instance.id)
-
         serializer = serializer(annotations, many=True)
         return serializer.data
     
@@ -76,6 +77,18 @@ class DocumentSerializer(serializers.ModelSerializer):
         connections = model.objects.filter(document=instance.id)
         serializer = serializer(connections, many=True)
         return serializer.data
+    
+    def get_assign(self, instance):
+        project = instance.project
+        model = project.get_docmapping_class()
+        serializer = project.get_docmapping_serializer()
+        assign = model.objects.filter(document=instance.id)
+        serializer = serializer(assign, many=True)
+        data = serializer.data
+        users = []
+        for i in data:
+            users.append(i['username'])
+        return users
 
     @classmethod
     def get_annotation_approver(cls, instance):
@@ -84,7 +97,7 @@ class DocumentSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Document
-        fields = ('id', 'text', 'annotations', 'connections', 'annotation_approver', 'entity_concordance', 'relation_concordance')
+        fields = ('id', 'text', 'annotations', 'connections', 'annotation_approver', 'assign', 'entity_concordance', 'relation_concordance')
 
 
 class ApproverSerializer(DocumentSerializer):
@@ -103,7 +116,6 @@ class ProjectSerializer(serializers.ModelSerializer):
             "is_annotator": settings.ROLE_ANNOTATOR,
             "is_annotation_approver": settings.ROLE_ANNOTATION_APPROVER,
         }
-        q = RoleMapping.objects
         queryset = RoleMapping.objects.values("role_id__name")
         if self.context.get("request").user.is_superuser:
             role_abstractor = {
@@ -189,3 +201,15 @@ class RoleMappingSerializer(serializers.ModelSerializer):
     class Meta:
         model = RoleMapping
         fields = ('id', 'user', 'role', 'username', 'rolename')
+
+class DocMappingSerializer(serializers.ModelSerializer):
+    username = serializers.SerializerMethodField()
+
+    @classmethod
+    def get_username(cls, instance):
+        user = instance.user
+        return user.username if user else None
+
+    class Meta:
+        model = DocMapping
+        fields = ('id', 'user', 'username', 'document', 'project')

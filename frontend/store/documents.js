@@ -172,6 +172,36 @@ export const actions = {
     }
     commit('resetSelected')
   },
+
+  addDocMapping({ commit, state }, payload) {
+    for (const document of state.selected) {
+      var assign = state.items.find(item => item.id === document.id).assign.find(item => item === payload.username)
+      if (assign) {
+        continue
+      }
+      DocumentService.addDocMapping(payload.projectId, {document:document.id, user:payload.userId})
+        .then((response) => {
+        })
+        .catch((error) => {
+          alert(error)
+        })
+    }
+    commit('resetSelected')
+  },
+
+  deleteDocMapping({ commit, state }, projectId) {
+    for (const document of state.selected) {
+      DocumentService.deleteDocMapping(projectId, document.id)
+        .then((response) => {
+        
+        })
+        .catch((error) => {
+          alert(error)
+        })
+    }
+    commit('resetSelected')
+  },
+
   addAnnotation({ commit, state }, payload) {
     const documentId = state.items[state.current].id
     AnnotationService.addAnnotation(payload.projectId, documentId, payload)

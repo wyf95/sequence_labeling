@@ -4,10 +4,11 @@ import random
 
 from django.contrib.auth.models import User
 from django.db import transaction
+from django.db.models.query import QuerySet
 from django.db.utils import IntegrityError
 from django.shortcuts import get_object_or_404
 from django_filters.rest_framework import DjangoFilterBackend
-from django.db.models import Count, F, Q
+from django.db.models import Count, Q, Subquery
 from rest_framework import generics, filters, status
 from rest_framework.exceptions import ParseError, ValidationError
 from rest_framework.permissions import IsAuthenticated, IsAuthenticatedOrReadOnly
@@ -17,10 +18,10 @@ from rest_framework.parsers import MultiPartParser
 from rest_framework_csv.renderers import CSVRenderer
 
 from .filters import DocumentFilter
-from .models import Project, Label, Document, RoleMapping, Role, Relation
+from .models import Project, Label, Document, RoleMapping, Role, DocMapping, Relation
 from .permissions import IsProjectAdmin, IsAnnotatorAndReadOnly, IsAnnotator, IsAnnotationApproverAndReadOnly, IsAnnotationApprover
 from .serializers import ProjectSerializer, LabelSerializer, DocumentSerializer, UserSerializer, ApproverSerializer, RelationSerializer
-from .serializers import RoleMappingSerializer, RoleSerializer
+from .serializers import RoleMappingSerializer, RoleSerializer, DocMappingSerializer
 from .utils import CSVParser, ExcelParser, JSONParser, PlainTextParser, CoNLLParser, AudioParser
 from .utils import JSONLRenderer
 from .utils import JSONPainter, CSVPainter
@@ -106,8 +107,6 @@ class StatisticsAPI(APIView):
         annotation_filter = Q(document_id__in=docs.all())
         user_data = self._get_user_completion_data(annotation_class, annotation_filter)
         done = docs.filter(annotations_approved_by__isnull=False).aggregate(Count('id'))['id__count']
-        # done = annotation_class.objects.filter(annotation_filter)\
-        #     .aggregate(Count('document', distinct=True))['document__count']
         remaining = total - done
         return {'total': total, 'remaining': remaining, 'user': user_data}
 
@@ -177,11 +176,25 @@ class DocumentList(generics.ListCreateAPIView):
     filter_class = DocumentFilter
     permission_classes = [IsAuthenticated & IsInProjectReadOnlyOrAdmin]
 
+    def is_role_of(self, user_id, project_id, role_name):
+        return RoleMapping.objects.filter(
+                    user_id=user_id,
+                    project_id=project_id,
+                    role_id=Subquery(Role.objects.filter(name=role_name).values('id')),
+                ).exists()
+
     def get_queryset(self):
         project = get_object_or_404(Project, pk=self.kwargs['project_id'])
-
         queryset = project.documents
         queryset = queryset.order_by('id')
+
+        user = self.request.user
+        if not user.is_superuser:
+            # project_admin / annotation_approver / annotator
+            isAnnotatorOrApprover  = self.is_role_of(user.id, project.id, 'annotator') \
+                                or self.is_role_of(user.id, project.id, 'annotation_approver')
+            if isAnnotatorOrApprover:
+                queryset = queryset.filter(docmapping__user=user.id)
         return queryset
 
     def perform_create(self, serializer):
@@ -209,9 +222,7 @@ class AnnotationList(generics.ListCreateAPIView):
     def get_queryset(self):
         project = get_object_or_404(Project, pk=self.kwargs['project_id'])
         model = project.get_annotation_class()
-
         queryset = model.objects.filter(document=self.kwargs['doc_id'])
-
         return queryset
 
     def create(self, request, *args, **kwargs):
@@ -231,7 +242,6 @@ class AnnotationDetail(generics.RetrieveUpdateDestroyAPIView):
     swagger_schema = None
 
     def get_permissions(self):
-        project = get_object_or_404(Project, pk=self.kwargs['project_id'])
         self.permission_classes = [IsAuthenticated & IsInProjectOrAdmin]
         return super().get_permissions()
 
@@ -258,9 +268,7 @@ class ConnectionList(generics.ListCreateAPIView):
     def get_queryset(self):
         project = get_object_or_404(Project, pk=self.kwargs['project_id'])
         model = project.get_connection_class()
-
         queryset = model.objects.filter(document=self.kwargs['doc_id'])
-
         return queryset
 
     def create(self, request, *args, **kwargs):
@@ -276,7 +284,6 @@ class ConnectionDetail(generics.RetrieveUpdateDestroyAPIView):
     swagger_schema = None
 
     def get_permissions(self):
-        project = get_object_or_404(Project, pk=self.kwargs['project_id'])
         self.permission_classes = [IsAuthenticated & IsInProjectOrAdmin]
         return super().get_permissions()
 
@@ -366,8 +373,6 @@ class Users(APIView):
     permission_classes = [IsAuthenticated & IsProjectAdmin]
 
     def get(self, request, *args, **kwargs):
-        # queryset = User.objects.all()
-        # 用于管理项目成员，superuser应可管理所有数据
         queryset = User.objects.filter(is_superuser=False)
         serialized_data = UserSerializer(queryset, many=True).data
         return Response(serialized_data)
@@ -399,6 +404,24 @@ class RoleMappingDetail(generics.RetrieveUpdateDestroyAPIView):
     serializer_class = RoleMappingSerializer
     lookup_url_kwarg = 'rolemapping_id'
     permission_classes = [IsAuthenticated & IsProjectAdmin]
+
+
+class DocMappingList(generics.ListCreateAPIView):
+    serializer_class = DocMappingSerializer
+    pagination_class = None
+    permission_classes = [IsAuthenticated & IsProjectAdmin]
+
+    def create(self, request, *args, **kwargs):
+        request.data['project'] = self.kwargs['project_id']
+        return super().create(request, *args, **kwargs)
+
+class DocMappingDetail(generics.RetrieveUpdateDestroyAPIView):
+    serializer_class = DocMappingSerializer
+    permission_classes = [IsAuthenticated & IsProjectAdmin]
+    
+    def delete(self, request, *args, **kwargs):
+        DocMapping.objects.filter(project=self.kwargs['project_id'], document=self.kwargs['doc_id']).delete()
+        return Response({'code':200})
 
 
 class LabelUploadAPI(APIView):
