@@ -346,4 +346,3 @@ def delete_linked_project(sender, instance, using, **kwargs):
         project = Project.objects.get(pk=projectInstance.pk)
         user.projects.remove(project)
         user.save()
-        DocMapping.objects.filter(project=project, user=user).delete()
