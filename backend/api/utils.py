@@ -398,6 +398,8 @@ class JSONPainter(object):
                 a.pop('document')
                 if a['relation']:
                     a['relation'] = Relation.objects.get(id=a['relation']).text
+            d.pop('approver_assign')
+            d.pop('annotator_assign')
             data.append(d)
         return data
 

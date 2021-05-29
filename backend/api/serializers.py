@@ -77,7 +77,7 @@ class DocumentSerializer(serializers.ModelSerializer):
         annotations = model.objects.filter(document=instance.id)
         
         request = self.context.get("request")
-        if self.is_role_of(request.user.id, project.id, 'annotator'):
+        if request and self.is_role_of(request.user.id, project.id, 'annotator'):
             annotations = annotations.filter(user=request.user)
 
         serializer = serializer(annotations, many=True)
