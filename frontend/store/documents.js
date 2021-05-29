@@ -173,6 +173,16 @@ export const actions = {
     commit('resetSelected')
   },
 
+  randomDocMapping({ commit }, payload) {
+    DocumentService.randomDocMapping(payload.projectId, {role:payload.role, number:payload.number})
+      .then((response) => {
+
+      })
+      .catch((error => {
+        alert(error)
+      }))
+  },
+
   addDocMapping({ commit, state }, payload) {
     for (const document of state.selected) {
       var annotator_assign = state.items.find(item => item.id === document.id).annotator_assign.find(item => item === payload.username)

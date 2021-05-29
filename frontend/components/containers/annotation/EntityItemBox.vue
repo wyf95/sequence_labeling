@@ -5,7 +5,7 @@
     :labels="items"
     :relations="relationItems"
     :text="currentDoc.text"
-    :entities="annotations"
+    :entities="currentDoc.annotations"
     :connections="currentDoc.connections"
     :update-entity="updateEntity"
     :add-entity="addEntity"
@@ -36,13 +36,6 @@ export default {
     },
     current_user() {
       return document.getElementById('current_user').innerText
-    },
-    annotations() {
-      if (this.getCurrentUserRole.is_annotator) {
-        return this.currentDoc.annotations.filter(item => item.username === this.current_user)
-      } else {
-        return this.currentDoc.annotations
-      }
     }
   },
 

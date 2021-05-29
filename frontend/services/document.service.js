@@ -21,6 +21,11 @@ class DocumentService {
     return this.request.post(`/projects/${projectId}/docmappings`, payload)
   }
 
+  randomDocMapping(projectId, payload) {
+    // {role: "approver" /annotator, number: 1}
+    return this.request.post(`/projects/${projectId}/randomdocmapping`, payload)
+  }
+
   deleteDocMapping(projectId, docId) {
     return this.request.delete(`/projects/${projectId}/docmappings/${docId}`)
   }

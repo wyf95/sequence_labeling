@@ -1,9 +1,9 @@
 from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.shortcuts import get_object_or_404
-from rest_framework import serializers
-from rest_framework.exceptions import ValidationError
+from rest_framework import request, serializers
 from django.db.models import Subquery
+from rest_framework.exceptions import ValidationError
 
 from .models import Label, Project, Document, RoleMapping, Role, DocMapping
 from .models import SequenceAnnotation, Connection, Relation
@@ -63,11 +63,23 @@ class DocumentSerializer(serializers.ModelSerializer):
     annotator_assign = serializers.SerializerMethodField()
     approver_assign = serializers.SerializerMethodField()
 
+    def is_role_of(self, user_id, project_id, role_name):
+        return RoleMapping.objects.filter(
+                    user_id=user_id,
+                    project_id=project_id,
+                    role_id=Subquery(Role.objects.filter(name=role_name).values('id')),
+                ).exists()
+
     def get_annotations(self, instance):
         project = instance.project
         model = project.get_annotation_class()
         serializer = project.get_annotation_serializer()
         annotations = model.objects.filter(document=instance.id)
+        
+        request = self.context.get("request")
+        if self.is_role_of(request.user.id, project.id, 'annotator'):
+            annotations = annotations.filter(user=request.user)
+
         serializer = serializer(annotations, many=True)
         return serializer.data
     
@@ -83,28 +95,22 @@ class DocumentSerializer(serializers.ModelSerializer):
         project = instance.project
         model = project.get_docmapping_class()
         serializer = project.get_docmapping_serializer()
-        assign = model.objects.filter(document=instance.id)
+        assign = model.objects.filter(document=instance.id, rolemap__role__name='annotator')
         serializer = serializer(assign, many=True)
-        data = serializer.data
         users = []
-        for i in data:
-            role = str(RoleMapping.objects.get(project=project, user=i['user']).role)
-            if role == 'annotator':
-                users.append(i['username'])
+        for i in serializer.data:
+            users.append(i['username'])
         return users
-    
+
     def get_approver_assign(self, instance):
         project = instance.project
         model = project.get_docmapping_class()
         serializer = project.get_docmapping_serializer()
-        assign = model.objects.filter(document=instance.id)
+        assign = model.objects.filter(document=instance.id, rolemap__role__name='annotation_approver')
         serializer = serializer(assign, many=True)
-        data = serializer.data
         users = []
-        for i in data:
-            role = str(RoleMapping.objects.get(project=project, user=i['user']).role)
-            if role == 'annotation_approver':
-                users.append(i['username'])
+        for i in serializer.data:
+            users.append(i['username'])
         return users
 
     @classmethod
@@ -114,7 +120,7 @@ class DocumentSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Document
-        fields = ('id', 'text', 'annotations', 'connections', 'annotation_approver', 'annotator_assign', 'approver_assign', 'entity_concordance', 'relation_concordance')
+        fields = ('id', 'text', 'annotations', 'connections', 'annotation_approver', 'approver_assign', 'annotator_assign', 'entity_concordance', 'relation_concordance')
 
 
 class ApproverSerializer(DocumentSerializer):
@@ -221,12 +227,18 @@ class RoleMappingSerializer(serializers.ModelSerializer):
 
 class DocMappingSerializer(serializers.ModelSerializer):
     username = serializers.SerializerMethodField()
+    rolename = serializers.SerializerMethodField()
 
     @classmethod
     def get_username(cls, instance):
-        user = instance.user
+        user = instance.rolemap.user
         return user.username if user else None
+
+    @classmethod
+    def get_rolename(cls, instance):
+        role = instance.rolemap.role
+        return role.name if role else None
 
     class Meta:
         model = DocMapping
-        fields = ('id', 'user', 'username', 'document', 'project')
+        fields = ('id', 'document', 'project', 'rolemap', 'username', 'rolename')

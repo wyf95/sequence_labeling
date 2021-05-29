@@ -9,6 +9,9 @@ export const state = () => ({
 export const getters = {
   isMemberSelected(state) {
     return state.selected.length > 0
+  },
+  currentMembers(state) {
+    return state.items
   }
 }
 

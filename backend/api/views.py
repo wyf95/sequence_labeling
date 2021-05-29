@@ -194,7 +194,7 @@ class DocumentList(generics.ListCreateAPIView):
             isAnnotatorOrApprover  = self.is_role_of(user.id, project.id, 'annotator') \
                                 or self.is_role_of(user.id, project.id, 'annotation_approver')
             if isAnnotatorOrApprover:
-                queryset = queryset.filter(docmapping__user=user.id)
+                queryset = queryset.filter(docmapping__rolemap__user=user)
         return queryset
 
     def perform_create(self, serializer):
@@ -345,7 +345,6 @@ class TextUploadAPI(APIView):
 
 class TextDownloadAPI(APIView):
     permission_classes = TextUploadAPI.permission_classes
-
     renderer_classes = (CSVRenderer, JSONLRenderer)
 
     def get(self, request, *args, **kwargs):
@@ -413,7 +412,10 @@ class DocMappingList(generics.ListCreateAPIView):
 
     def create(self, request, *args, **kwargs):
         request.data['project'] = self.kwargs['project_id']
+        rolemap = RoleMapping.objects.get(project=request.data['project'], user=request.data['user'])
+        request.data['rolemap'] = rolemap.id
         return super().create(request, *args, **kwargs)
+    
 
 class DocMappingDetail(generics.RetrieveUpdateDestroyAPIView):
     serializer_class = DocMappingSerializer
@@ -422,6 +424,42 @@ class DocMappingDetail(generics.RetrieveUpdateDestroyAPIView):
     def delete(self, request, *args, **kwargs):
         DocMapping.objects.filter(project=self.kwargs['project_id'], document=self.kwargs['doc_id']).delete()
         return Response({'code':200})
+
+class RandomDocMappingAPI(APIView):
+    permission_classes = [IsAuthenticated & IsProjectAdmin]
+
+    def post(self, request, *args, **kwargs):
+        project = get_object_or_404(Project, pk=self.kwargs['project_id'])
+        role_id=Subquery(Role.objects.filter(name=request.data['role']).values('id'))
+        rolemappings = RoleMapping.objects.filter(
+                    project_id=project.id,
+                    role_id=role_id
+                )
+        documents = Document.objects.filter(project_id=project.id)
+        if rolemappings and documents:
+            self.randomMap(
+                project=project,
+                users = rolemappings,
+                role_id = role_id,
+                number=request.data['number'],
+                documents = documents
+            )
+        return Response(status=status.HTTP_201_CREATED)
+
+    @classmethod
+    def randomMap(self, project, users, role_id, number, documents):
+        for doc in documents:
+            choseUser = random.choice(users).user
+            assignNumber = len(DocMapping.objects.filter(project=project.id, document=doc.id, rolemap__role_id=role_id))
+            while (assignNumber < number):
+                exist = DocMapping.objects.filter(project=project.id, document=doc.id, rolemap__user_id=choseUser.id).exists()
+                if exist:
+                    choseUser = random.choice(users).user
+                    continue
+                rolemap = RoleMapping.objects.get(project=project.id, user=choseUser.id, role=role_id)
+                docmap = DocMapping.objects.create(project=project, document=doc, rolemap=rolemap)
+                docmap.save()
+                assignNumber = assignNumber + 1
 
 
 class LabelUploadAPI(APIView):

@@ -189,11 +189,11 @@ class RoleMapping(models.Model):
 
 class DocMapping(models.Model):
     project = models.ForeignKey(Project, related_name='doc_mappings', on_delete=models.CASCADE)
-    user = models.ForeignKey(User, related_name='doc_mappings', on_delete=models.CASCADE)
     document = models.ForeignKey(Document, on_delete=models.CASCADE)
+    rolemap = models.ForeignKey(RoleMapping, on_delete=models.CASCADE)
 
     class Meta:
-        unique_together = ("project", "user", "document")
+        unique_together = ("project", "document", "rolemap")
 
 
 
@@ -346,3 +346,4 @@ def delete_linked_project(sender, instance, using, **kwargs):
         project = Project.objects.get(pk=projectInstance.pk)
         user.projects.remove(project)
         user.save()
+        DocMapping.objects.filter(project=project, user=user).delete()
