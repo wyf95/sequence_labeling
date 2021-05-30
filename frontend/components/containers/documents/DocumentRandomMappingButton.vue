@@ -52,7 +52,7 @@
 </template>
 
 <script>
-import { mapState, mapGetters, mapActions } from 'vuex'
+import { mapGetters, mapActions } from 'vuex'
 import BaseCard from '@/components/molecules/BaseCard'
 
 export default {
@@ -94,7 +94,7 @@ export default {
 
   methods: {
     ...mapActions('members', ['getMemberList']),
-    ...mapActions('documents', ['getDocumentList', 'randomDocMapping']),
+    ...mapActions('documents', ['randomDocMapping']),
 
     validation() {
       var number = parseInt(this.assignNumber)
@@ -125,9 +125,6 @@ export default {
           number: parseInt(this.assignNumber)
         })
         this.cancel()
-        this.getDocumentList({
-          projectId: this.$route.params.id
-        })
       }
     }
   }

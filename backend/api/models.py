@@ -18,9 +18,7 @@ class Project(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     users = models.ManyToManyField(User, related_name='projects')
-    entity_concordance = models.DecimalField(default=1.00, max_digits=6, decimal_places=4)
-    relation_concordance = models.DecimalField(default=1.00, max_digits=6, decimal_places=4)
-
+    
     def get_absolute_url(self):
         return reverse('upload', args=[self.id])
 
@@ -196,7 +194,6 @@ class DocMapping(models.Model):
         unique_together = ("project", "document", "rolemap")
 
 
-
 def fleiss(table, n):
     table = 1.0 * np.asarray(table) 
     n_sub, _ = table.shape
@@ -284,22 +281,6 @@ def comput_relation_concordance(instance):
     document.relation_concordance = f
     document.save()
 
-def comput_project_concordance(instance):
-    project = instance.project
-    if not project:
-        return
-    documents = Document.objects.filter(project=project.id)
-    if len(documents) != 0:
-        documents_entity_concordance = np.array([k.entity_concordance for k in documents])
-        project.entity_concordance = documents_entity_concordance.mean()
-        documents_relation_concordance = np.array([k.relation_concordance for k in documents])
-        project.relation_concordance = documents_relation_concordance.mean()
-        project.save()
-    else:
-        project.entity_concordance = 1.0
-        project.relation_concordance = 1.0
-        project.save()
-
 @receiver(post_save, sender=SequenceAnnotation)
 def save_annotation_comput_concordance(sender, instance, created, **kwargs):
     comput_annotation_concordance(instance)
@@ -315,14 +296,6 @@ def save_connection_comput_concordance(sender, instance, created, **kwargs):
 @receiver(post_delete, sender=Connection)
 def delete_connection_comput_concordance(sender, instance, using, **kwargs):
     comput_relation_concordance(instance)
-
-@receiver(post_save, sender=Document)
-def save_document_comput_concordance(sender, instance, created, **kwargs):
-    comput_project_concordance(instance)
-
-@receiver(post_delete, sender=Document)
-def delete_document_comput_concordance(sender, instance, using, **kwargs):
-    comput_project_concordance(instance)
 
 
 @receiver(post_save, sender=RoleMapping)

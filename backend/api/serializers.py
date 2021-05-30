@@ -1,12 +1,13 @@
+import numpy as np
 from django.conf import settings
 from django.contrib.auth import get_user_model
-from django.shortcuts import get_object_or_404
-from rest_framework import request, serializers
 from django.db.models import Subquery
+from django.shortcuts import get_object_or_404
+from rest_framework import serializers
 from rest_framework.exceptions import ValidationError
 
-from .models import Label, Project, Document, RoleMapping, Role, DocMapping
-from .models import SequenceAnnotation, Connection, Relation
+from .models import (Connection, DocMapping, Document, Label, Project,
+                     Relation, Role, RoleMapping, SequenceAnnotation)
 
 
 class UserSerializer(serializers.ModelSerializer):
@@ -132,6 +133,8 @@ class ApproverSerializer(DocumentSerializer):
 
 class ProjectSerializer(serializers.ModelSerializer):
     current_users_role = serializers.SerializerMethodField()
+    entity_concordance = serializers.SerializerMethodField()
+    relation_concordance = serializers.SerializerMethodField()
 
     def get_current_users_role(self, instance):
         role_abstractor = {
@@ -154,6 +157,23 @@ class ProjectSerializer(serializers.ModelSerializer):
             for key, val in role_abstractor.items():
                 role_abstractor[key] = users_role["role_id__name"] == val
         return role_abstractor
+    
+    def get_entity_concordance(self, instance):
+        documents = Document.objects.filter(project=instance.id)
+        if len(documents) != 0:
+            documents_entity_concordance = np.array([k.entity_concordance for k in documents])
+            return round(documents_entity_concordance.mean(), 4)
+        else:
+            return 1.0
+
+    def get_relation_concordance(self, instance):
+        documents = Document.objects.filter(project=instance.id)
+        if len(documents) != 0:
+            documents_relation_concordance = np.array([k.relation_concordance for k in documents])
+            return round(documents_relation_concordance.mean(), 4)
+        else:
+            return 1.0
+
 
     class Meta:
         model = Project

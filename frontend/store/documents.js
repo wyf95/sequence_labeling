@@ -173,14 +173,15 @@ export const actions = {
     commit('resetSelected')
   },
 
-  randomDocMapping({ commit }, payload) {
+  randomDocMapping({ commit, dispatch }, payload) {
+    commit('setLoading', true)
     DocumentService.randomDocMapping(payload.projectId, {role:payload.role, number:payload.number})
       .then((response) => {
-
+        dispatch('getDocumentList', payload)
       })
-      .catch((error => {
-        alert(error)
-      }))
+      .finally(() => {
+        commit('setLoading', false)
+      })
   },
 
   addDocMapping({ commit, state }, payload) {
@@ -204,7 +205,6 @@ export const actions = {
     for (const document of state.selected) {
       DocumentService.deleteDocMapping(projectId, document.id)
         .then((response) => {
-        
         })
         .catch((error) => {
           alert(error)
