@@ -4,7 +4,6 @@ import random
 
 from django.contrib.auth.models import User
 from django.db import transaction
-from django.db.models.query import QuerySet
 from django.db.utils import IntegrityError
 from django.shortcuts import get_object_or_404
 from django_filters.rest_framework import DjangoFilterBackend
@@ -191,9 +190,8 @@ class DocumentList(generics.ListCreateAPIView):
         user = self.request.user
         if not user.is_superuser:
             # project_admin / annotation_approver / annotator
-            isAnnotatorOrApprover  = self.is_role_of(user.id, project.id, 'annotator') \
-                                or self.is_role_of(user.id, project.id, 'annotation_approver')
-            if isAnnotatorOrApprover:
+            isAdmin  = self.is_role_of(user.id, project.id, 'project_admin')           
+            if not isAdmin:
                 queryset = queryset.filter(docmapping__rolemap__user=user)
         return queryset
 

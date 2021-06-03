@@ -181,28 +181,29 @@ export default {
       // 将entity按user分组
       var entities = this.entities.slice().sort((a, b) => a.start_offset - b.start_offset)
       this.entitiesList = lodash.groupBy(entities, 'username')
-      
-      // 加入当前用户
-      if (!this.entitiesList[this.user]) {
-        chunksList.push(this.makeChunks(this.text.slice(0, this.text.length)))
-        this.users.push({name: this.user, id: null})
-        this.entitiesList[this.user] = []
-      } else {
+
+      // 加入当前用户，双栏
+      chunksList.push(this.makeChunks(this.text.slice(0, this.text.length)))
+      this.users.push({name: '', id: null, len: this.text.length + 1})
+
+      if (this.entitiesList[this.user]) {
         const entities = this.entitiesList[this.user]
-        chunksList.push(this.getChunks(entities))
-        this.users.push({name: this.user, id: entities[0].user})
+        const res = this.getChunks(entities)
+        chunksList.push(res.chunks)
+        this.users.push({name: this.user, id: null, len: res.len + this.user.length + 1})
+      }
+      else {
+        this.entitiesList[this.user] = []
       }
 
       // 加入其他用户
-      let userSorted = Object.keys(this.entitiesList).sort()
+      let userSorted = Object.keys(this.entitiesList).sort().filter(item => item !== this.user)
       for (const key in userSorted) {
         let user = userSorted[key]
-        if (user === this.user) {
-          continue
-        }
         const entities = this.entitiesList[user];
-        chunksList.push(this.getChunks(entities))
-        this.users.push({name: user, id: entities[0].user})
+        const res = this.getChunks(entities)
+        chunksList.push(res.chunks)
+        this.users.push({name: user, id: entities[0].user, len: res.len + user.length + 1})
       }
 
       this.$nextTick(() => {
@@ -438,10 +439,14 @@ export default {
     getChunks(entities) {
       let startOffset = 0
       let chunks = []
+      let len = 0
       for (const entity of entities) {
         // add non-entities to chunks.
-        chunks = chunks.concat(this.makeChunks(this.text.slice(startOffset, entity.start_offset)))
-        startOffset = entity.end_offset
+        if (startOffset <= entity.start_offset) {
+          chunks = chunks.concat(this.makeChunks(this.text.slice(startOffset, entity.start_offset)))
+          len = len + entity.start_offset - startOffset
+          startOffset = entity.end_offset
+        }
         // add entities to chunks.
         const label = this.labelObject[entity.label]
         chunks.push({
@@ -450,10 +455,12 @@ export default {
           color: label.background_color,
           text: this.text.slice(entity.start_offset, entity.end_offset)
         })
+        len = len + entity.end_offset - entity.start_offset
       }
       // add the rest of text.
       chunks = chunks.concat(this.makeChunks(this.text.slice(startOffset, this.text.length)))
-      return chunks
+      len = len + this.text.length - startOffset
+      return { chunks: chunks, len: len }
     },
 
     makeChunks(text) {
@@ -511,16 +518,16 @@ export default {
       this.end = this.start + [...range.toString()].length
 
       let i = 0
-      while (this.start > this.text.length && i < this.users.length) {
-        this.start = this.start - this.text.length - this.users[i].name.length - 1
-        this.end = this.end - this.text.length - this.users[i].name.length - 1
+      while (this.start > this.text.length) {
+        this.start = this.start - this.users[i].len
+        this.end = this.end - this.users[i].len
         i = i + 1
       }
       this.choseUser = i
     },
     
     validateSpan() {
-      if (!this.users[this.choseUser]) {
+      if (!this.users[this.choseUser] || this.choseUser === 1) {
         return false
       }
       if ((typeof this.start === 'undefined') || (typeof this.end === 'undefined')) {
@@ -528,6 +535,14 @@ export default {
       }
       if (this.start === this.end) {
         return false
+      }
+      if (this.users[this.choseUser].name === "") {
+        for (const entity of this.entitiesList[this.user]) {
+          if ((entity.start_offset === this.start) && (this.end === entity.end_offset)) {
+            return false
+          }
+        }
+        return true
       }
       for (const entity of this.entitiesList[this.users[this.choseUser].name]) {
         if ((entity.start_offset <= this.start) && (this.start < entity.end_offset)) {
