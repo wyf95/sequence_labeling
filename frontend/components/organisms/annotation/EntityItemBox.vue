@@ -182,10 +182,11 @@ export default {
       var entities = this.entities.slice().sort((a, b) => a.start_offset - b.start_offset)
       this.entitiesList = lodash.groupBy(entities, 'username')
 
-      // 加入当前用户，双栏
+      // 加入当前用户
+      // 空白文本框
       chunksList.push(this.makeChunks(this.text.slice(0, this.text.length)))
       this.users.push({name: '', id: null, len: this.text.length + 1})
-
+      // 标注文本框
       if (this.entitiesList[this.user]) {
         const entities = this.entitiesList[this.user]
         const res = this.getChunks(entities)
@@ -200,7 +201,11 @@ export default {
       let userSorted = Object.keys(this.entitiesList).sort().filter(item => item !== this.user)
       for (const key in userSorted) {
         let user = userSorted[key]
-        const entities = this.entitiesList[user];
+        const entities = this.entitiesList[user]
+        // 空白文本框
+        chunksList.push(this.makeChunks(this.text.slice(0, this.text.length)))
+        this.users.push({name: '', id: entities[0].user, len: this.text.length + 1})
+        // 标注文本框
         const res = this.getChunks(entities)
         chunksList.push(res.chunks)
         this.users.push({name: user, id: entities[0].user, len: res.len + user.length + 1})
@@ -445,7 +450,6 @@ export default {
         if (startOffset <= entity.start_offset) {
           chunks = chunks.concat(this.makeChunks(this.text.slice(startOffset, entity.start_offset)))
           len = len + entity.start_offset - startOffset
-          startOffset = entity.end_offset
         }
         // add entities to chunks.
         const label = this.labelObject[entity.label]
@@ -455,6 +459,7 @@ export default {
           color: label.background_color,
           text: this.text.slice(entity.start_offset, entity.end_offset)
         })
+        startOffset = entity.end_offset
         len = len + entity.end_offset - entity.start_offset
       }
       // add the rest of text.
@@ -527,7 +532,7 @@ export default {
     },
     
     validateSpan() {
-      if (!this.users[this.choseUser] || this.choseUser === 1) {
+      if (!this.users[this.choseUser] || this.choseUser % 2 === 1) {
         return false
       }
       if ((typeof this.start === 'undefined') || (typeof this.end === 'undefined')) {
@@ -536,22 +541,9 @@ export default {
       if (this.start === this.end) {
         return false
       }
-      if (this.users[this.choseUser].name === "") {
-        for (const entity of this.entitiesList[this.user]) {
-          if ((entity.start_offset === this.start) && (this.end === entity.end_offset)) {
-            return false
-          }
-        }
-        return true
-      }
+      this.choseUser = this.choseUser % 2 === 0 ? this.choseUser + 1 : this.choseUser
       for (const entity of this.entitiesList[this.users[this.choseUser].name]) {
-        if ((entity.start_offset <= this.start) && (this.start < entity.end_offset)) {
-          return false
-        }
-        if ((entity.start_offset < this.end) && (this.end <= entity.end_offset)) {
-          return false
-        }
-        if ((this.start < entity.start_offset) && (entity.end_offset < this.end)) {
+        if ((entity.start_offset === this.start) && entity.end_offset === this.end) {
           return false
         }
       }
@@ -564,12 +556,10 @@ export default {
       }
     },
     assignLabel(labelId) {
-      if (this.validateSpan()) {
-        this.addEntity(this.start, this.end, labelId, this.users[this.choseUser].id)
-        this.showMenu = false
-        this.start = 0
-        this.end = 0
-      }
+      this.addEntity(this.start, this.end, labelId, this.users[this.choseUser].id)
+      this.showMenu = false
+      this.start = 0
+      this.end = 0
     }
   }
 }
