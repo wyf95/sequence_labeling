@@ -79,7 +79,7 @@ npm run start
 cd backend
 
 # 安装依赖
-# 若提示安装psycopg2报错，请安装postgresql(如apt install postgresql)
+# 若提示安装psycopg2报错，请安装postgresql(如apt install postgresql，不同系统安装命令不同)
 pip install -r requirments.txt
 
 # 清空数据库
@@ -197,10 +197,10 @@ nginx -t
 **【实体标注】**
 
 - 选择文本，从弹出框选择标签
-- 对当前用户显示两个文本框
+- 对每个用户显示两个文本框
   - 在第一个文本框内选中文本进行标注
   - 标注情况将均显示在第二个文本框内
-  - 第二个文本框内不选中文本
+  - 第二个文本框内不可选中文本
 - 请注意：显示多个标注情况时，**在某用户的标注情况内进行标注，该标注将被该用户拥有**
 
 **【实体关系】**
