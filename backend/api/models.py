@@ -12,11 +12,16 @@ from django.core.exceptions import ValidationError
 from .managers import AnnotationManager
 
 class Project(models.Model):
+    # 项目表
+    # 名称
     name = models.CharField(max_length=100)
+    # 描述
     description = models.TextField(default='')
+    # 如何标注
     guideline = models.TextField(default='', null=True, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
+
     users = models.ManyToManyField(User, related_name='projects')
     
     def get_absolute_url(self):
@@ -61,6 +66,7 @@ class Project(models.Model):
 
 
 class Label(models.Model):
+    # 实体标签
     PREFIX_KEYS = (
         ('ctrl', 'ctrl'),
         ('shift', 'shift'),
@@ -69,13 +75,16 @@ class Label(models.Model):
     SUFFIX_KEYS = tuple(
         (c, c) for c in string.digits + string.ascii_lowercase
     )
-
+    # 标签名
     text = models.CharField(max_length=100)
     prefix_key = models.CharField(max_length=10, blank=True, null=True, choices=PREFIX_KEYS)
+    # 快捷键
     suffix_key = models.CharField(max_length=1, blank=True, null=True, choices=SUFFIX_KEYS)
     project = models.ForeignKey(Project, related_name='labels', on_delete=models.CASCADE)
+    # 颜色
     background_color = models.CharField(max_length=7, default='#209cee')
     text_color = models.CharField(max_length=7, default='#ffffff')
+    # 创建时间 修改时间
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
@@ -101,7 +110,10 @@ class Label(models.Model):
         )
 
 class Document(models.Model):
+    # 数据表
+    # 数据
     text = models.TextField()
+    # 项目 id 外键
     project = models.ForeignKey(Project, related_name='documents', on_delete=models.CASCADE)
     meta = models.TextField(default='{}')
     created_at = models.DateTimeField(auto_now_add=True)
@@ -123,6 +135,7 @@ class Annotation(models.Model):
         abstract = True
 
 class SequenceAnnotation(Annotation):
+    # 标签注释 在句子中的位置
     document = models.ForeignKey(Document, related_name='seq_annotations', on_delete=models.CASCADE)
     label = models.ForeignKey(Label, on_delete=models.CASCADE)
     start_offset = models.IntegerField()
@@ -137,6 +150,7 @@ class SequenceAnnotation(Annotation):
         unique_together = ('document', 'user', 'label', 'start_offset', 'end_offset')
 
 class Relation(models.Model):
+    # 关系标签
     text = models.CharField(max_length=100)
     project = models.ForeignKey(Project, related_name='relations', on_delete=models.CASCADE)
     color = models.CharField(max_length=7, default='#209cee')
@@ -150,6 +164,7 @@ class Relation(models.Model):
         )
 
 class Connection(models.Model):
+    # 实体 - 关系 - 实体
     document = models.ForeignKey(Document, related_name='seq_connections', on_delete=models.CASCADE)
     source = models.ForeignKey(SequenceAnnotation, related_name='conn_source', on_delete=models.CASCADE)
     to = models.ForeignKey(SequenceAnnotation, related_name='conn_to', on_delete=models.CASCADE)
@@ -160,6 +175,7 @@ class Connection(models.Model):
 
 
 class Role(models.Model):
+    # 角色  共3个角色 项目管理员 标注者 审核者
     name = models.CharField(max_length=100, unique=True)
     description = models.TextField(default='')
     created_at = models.DateTimeField(auto_now_add=True)
@@ -170,6 +186,7 @@ class Role(models.Model):
 
 
 class RoleMapping(models.Model):
+    # 项目 角色
     user = models.ForeignKey(User, related_name='role_mappings', on_delete=models.CASCADE)
     project = models.ForeignKey(Project, related_name='role_mappings', on_delete=models.CASCADE)
     role = models.ForeignKey(Role, on_delete=models.CASCADE)

@@ -317,10 +317,31 @@ class TextUploadAPI(APIView):
 
     @classmethod
     def save_file(cls, user, file, file_format, spliter, project_id):
+        """
+        user: 用户  admin
+        file: 上传文件
+        file: 文件格式
+        spliter: 分隔符
+        project_id: 项目id
+        """
+        print(f"user: {user} {type(user)}")
+        print(f"file: {file} {type(file)}")
+        print(f"file_format: {file_format} {type(file_format)}")
+        print(f"spliter: {spliter} {type(spliter)}")
+        print(f"project_id: {project_id} {type(project_id)}")
         project = get_object_or_404(Project, pk=project_id)
+        # 根据文件格式 选择文件解析器
         parser = cls.select_parser(file_format)
+        # 将文件按分割符切分 返回一个生成器
         data = parser.parse(file, spliter)
         storage = project.get_storage(data)
+        # print("******************************")
+        # print(f"data: {data}")
+        # for i in data:
+        #     print(i)
+        # print("******************************")
+        print(f"project: {project}  {type(project)}")
+        print(f"storage: {storage}")
         storage.save(user)
 
     @classmethod

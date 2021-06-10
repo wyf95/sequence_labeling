@@ -27,7 +27,7 @@ def extract_label(tag):
     else:
         return tag
 
-
+# 存储基类
 class BaseStorage(object):
 
     def __init__(self, data, project):
@@ -110,7 +110,7 @@ class BaseStorage(object):
             saved[label.text] = label
         return saved
 
-
+# 普通存储 没有使用
 class PlainStorage(BaseStorage):
 
     @transaction.atomic
@@ -119,6 +119,7 @@ class PlainStorage(BaseStorage):
             self.save_doc(text)
 
 
+# 序列标注存储
 class SequenceLabelingStorage(BaseStorage):
     """Upload jsonl for sequence labeling.
 

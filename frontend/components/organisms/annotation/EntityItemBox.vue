@@ -195,6 +195,8 @@ export default {
       }
       else {
         this.entitiesList[this.user] = []
+        chunksList.push(this.makeChunks(this.text.slice(0, this.text.length)))
+        this.users.push({name: this.user, id: null, len: this.text.length + this.user.length + 1})
       }
 
       // 加入其他用户
@@ -542,9 +544,11 @@ export default {
         return false
       }
       this.choseUser = this.choseUser % 2 === 0 ? this.choseUser + 1 : this.choseUser
-      for (const entity of this.entitiesList[this.users[this.choseUser].name]) {
-        if ((entity.start_offset === this.start) && entity.end_offset === this.end) {
-          return false
+      if (this.users[this.choseUser]) {
+        for (const entity of this.entitiesList[this.users[this.choseUser].name]) {
+          if ((entity.start_offset === this.start) && entity.end_offset === this.end) {
+            return false
+          }
         }
       }
       return true
@@ -556,7 +560,7 @@ export default {
       }
     },
     assignLabel(labelId) {
-      this.addEntity(this.start, this.end, labelId, this.users[this.choseUser].id)
+      this.addEntity(this.start, this.end, labelId, this.users[this.choseUser - 1].id)
       this.showMenu = false
       this.start = 0
       this.end = 0
